@@ -1,0 +1,78 @@
+option(
+    'startup-notification',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable startup notification support (libstartup-notification)',
+)
+option(
+    'xcursor',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable X Cursor library support',
+)
+option(
+    'imlib2',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable Imlib2 support for loading icon images',
+)
+option(
+    'librsvg',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable librsvg support for loading SVG icon images',
+)
+option(
+    'session-management',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable X11 Session Management (libSM/libICE) support',
+)
+option(
+    'xkb',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable XKB extension support',
+)
+option(
+    'xrandr',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable XRandR extension support',
+)
+option(
+    'xshape',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable XShape extension support',
+)
+option(
+    'xinerama',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable Xinerama extension support',
+)
+option(
+    'xsync',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable XSync extension support',
+)
+option(
+    'nls',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable Native Language Support (gettext)',
+)
+option(
+    'default-theme',
+    type: 'string',
+    value: 'Clearlooks',
+    description: 'Default Openbox theme name',
+)
+option(
+    'tests',
+    type: 'boolean',
+    value: false,
+    description: 'Build optional interactive X11 test programs',
+)
