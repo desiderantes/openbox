@@ -94,24 +94,33 @@ pkg.generate(
     requires: [glib_dep, xml_dep, x11_dep],
 )
 
-obt_unittests = executable(
-    'obt_unittests',
-    files(
-        'bsearch_unittest.c',
-        'link_unittest.c',
-        'paths_unittest.c',
-        'unittest_base.c',
-    ),
-    include_directories: root_inc,
-    dependencies: [obt_dep, glib_dep],
-    c_args: [
-        '-DG_LOG_DOMAIN="Obt-Unittests"',
-        f'-DLOCALEDIR="@localedir@"',
-        f'-DDATADIR="@datadir@"',
-        f'-DCONFIGDIR="@configdir@"',
-    ],
-    export_dynamic: true,
-    install: false,
-)
+obt_tests = [
+    'bsearch',
+    'link',
+    'paths',
+]
 
-test('obt-unittests', obt_unittests)
+foreach name : obt_tests
+    t = executable(
+        f'test_@name@',
+        files(f'@name@_unittest.c'),
+        include_directories: root_inc,
+        implicit_include_directories: false,
+        dependencies: [obt_dep, glib_dep],
+        c_args: [
+            '-UG_DISABLE_ASSERT',
+            '-DG_LOG_DOMAIN="Obt-Test"',
+            f'-DLOCALEDIR="@localedir@"',
+            f'-DDATADIR="@datadir@"',
+            f'-DCONFIGDIR="@configdir@"',
+        ],
+        install: false,
+    )
+    test(
+        name,
+        t,
+        args: ['--tap'],
+        protocol: 'tap',
+        suite: 'obt',
+    )
+endforeach

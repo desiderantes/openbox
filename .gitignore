@@ -6,7 +6,3 @@ TAGS
 *.o
 *.orig
 *.rej
-obt/tests/bstest
-obt/tests/ddtest
-obt/tests/linktest
-obt/tests/watchtest

@@ -1,32 +1,26 @@
-#include "obt/unittest_base.h"
-
 #include "obt/bsearch.h"
 
 #include <glib.h>
 
-static void empty() {
-    TEST_START();
-
+static void test_empty(void)
+{
     BSEARCH_SETUP();
-    int* array = NULL;
+    int *array = NULL;
     guint array_size = 0;
 
     /* Search in an empty array. */
     BSEARCH(int, array, 0, array_size, 10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
 
     /* Search in an empty array with a non-zero starting position. */
     BSEARCH(int, array, 10, array_size, -10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(10, BSEARCH_AT());
-
-    TEST_END();
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 10);
 }
 
-static void single_element() {
-    TEST_START();
-
+static void test_single_element(void)
+{
     BSEARCH_SETUP();
     int array[1];
     guint array_size = 1;
@@ -34,44 +28,41 @@ static void single_element() {
     /* Search for something smaller than the only element. */
     array[0] = 20;
     BSEARCH(int, array, 0, array_size, -10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for something bigger than the only element. */
     array[0] = 20;
     BSEARCH(int, array, 0, array_size, 30);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for something smaller than the only element. */
     array[0] = -20;
     BSEARCH(int, array, 0, array_size, -30);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for something bigger than the only element. */
     array[0] = -20;
     BSEARCH(int, array, 0, array_size, 10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for the only element that exists. */
     array[0] = -20;
     BSEARCH(int, array, 0, array_size, -20);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
-
-    TEST_END();
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 }
 
-static void single_element_nonzero_start() {
-    TEST_START();
-
+static void test_single_element_nonzero_start(void)
+{
     BSEARCH_SETUP();
     int array[10];
     guint array_start = 9;
@@ -80,237 +71,195 @@ static void single_element_nonzero_start() {
     /* Search for something smaller than the only element. */
     array[array_start] = 20;
     BSEARCH(int, array, array_start, array_size, -10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for something bigger than the only element. */
     array[array_start] = 20;
     BSEARCH(int, array, array_start, array_size, 30);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for something smaller than the only element. */
     array[array_start] = -20;
     BSEARCH(int, array, array_start, array_size, -30);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for something bigger than the only element. */
     array[array_start] = -20;
     BSEARCH(int, array, array_start, array_size, 10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     /* Search for the only element that exists. */
     array[array_start] = -20;
     BSEARCH(int, array, array_start, array_size, -20);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
-
-    TEST_END();
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 }
 
-static void present() {
-    TEST_START();
-
+static void test_present(void)
+{
     BSEARCH_SETUP();
-    int array[5];
+    int array[5] = { 10, 12, 14, 16, 18 };
     guint array_start = 0;
     guint array_size = 5;
 
-    array[0] = 10;
-    array[1] = 12;
-    array[2] = 14;
-    array[3] = 16;
-    array[4] = 18;
-
-    /* Search for something that is in the array. */
-
     BSEARCH(int, array, array_start, array_size, 10);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 12);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(1, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 1);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 14);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(2, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 2);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 16);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(3, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 3);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 18);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(4, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
-
-    TEST_END();
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 4);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 }
 
-static void present_nonzero_start() {
-    TEST_START();
-
+static void test_present_nonzero_start(void)
+{
     BSEARCH_SETUP();
-    int array[5];
+    int array[5] = { 10, 12, 14, 16, 18 };
     guint array_start = 2;
     guint array_size = 3;
 
-    array[0] = 10;
-    array[1] = 12;
-    array[2] = 14;
-    array[3] = 16;
-    array[4] = 18;
-
-    /* Search for something that is in the array. */
-
     BSEARCH(int, array, array_start, array_size, 10);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 12);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 14);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(2, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 2);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 16);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(3, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 3);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 18);
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(4, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
-
-    TEST_END();
+    g_assert_true(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 4);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 }
 
-static void missing() {
-    TEST_START();
-
+static void test_missing(void)
+{
     BSEARCH_SETUP();
-    int array[5];
+    int array[5] = { 10, 12, 14, 16, 18 };
     guint array_start = 0;
     guint array_size = 5;
 
-    array[0] = 10;
-    array[1] = 12;
-    array[2] = 14;
-    array[3] = 16;
-    array[4] = 18;
-
-    /* Search for something that is _not_ in the array. */
-
     BSEARCH(int, array, array_start, array_size, 9);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 11);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(0, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 0);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 13);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(1, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 1);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 15);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(2, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 2);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 17);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(3, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 3);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 19);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(4, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
-
-    TEST_END();
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 4);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 }
 
-static void missing_nonzero_start() {
-    TEST_START();
-
+static void test_missing_nonzero_start(void)
+{
     BSEARCH_SETUP();
-    int array[5];
+    int array[5] = { 10, 12, 14, 16, 18 };
     guint array_start = 2;
     guint array_size = 3;
 
-    array[0] = 10;
-    array[1] = 12;
-    array[2] = 14;
-    array[3] = 16;
-    array[4] = 18;
-
-    /* Search for something that is _not_ in the array. */
-
     BSEARCH(int, array, array_start, array_size, 9);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 11);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 13);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(array_start, BSEARCH_AT());
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, array_start);
+    g_assert_false(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 15);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(2, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 2);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 17);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(3, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 3);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 
     BSEARCH(int, array, array_start, array_size, 19);
-    EXPECT_BOOL_EQ(FALSE, BSEARCH_FOUND());
-    EXPECT_UINT_EQ(4, BSEARCH_AT());
-    EXPECT_BOOL_EQ(TRUE, BSEARCH_FOUND_NEAREST_SMALLER());
-
-    TEST_END();
+    g_assert_false(BSEARCH_FOUND());
+    g_assert_cmpuint(BSEARCH_AT(), ==, 4);
+    g_assert_true(BSEARCH_FOUND_NEAREST_SMALLER());
 }
 
-void run_bsearch_unittest() {
-    unittest_start_suite("bsearch");
+int main(int argc, char **argv)
+{
+    g_test_init(&argc, &argv, NULL);
 
-    empty();
-    single_element();
-    single_element_nonzero_start();
-    present();
-    present_nonzero_start();
-    missing();
-    missing_nonzero_start();
+    g_test_add_func("/bsearch/empty", test_empty);
+    g_test_add_func("/bsearch/single-element", test_single_element);
+    g_test_add_func("/bsearch/single-element-nonzero-start",
+                    test_single_element_nonzero_start);
+    g_test_add_func("/bsearch/present", test_present);
+    g_test_add_func("/bsearch/present-nonzero-start",
+                    test_present_nonzero_start);
+    g_test_add_func("/bsearch/missing", test_missing);
+    g_test_add_func("/bsearch/missing-nonzero-start",
+                    test_missing_nonzero_start);
 
-    unittest_end_suite();
+    return g_test_run();
 }
