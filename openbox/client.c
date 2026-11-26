@@ -1750,7 +1750,7 @@ void client_update_normal_hints(ObClient *self)
     SIZE_SET(self->max_size, G_MAXINT, G_MAXINT);
 
     /* get the hints from the window */
-    if (XGetWMNormalHints(obt_display, staging.window, &size, &ret)) {
+    if (XGetWMNormalHints(obt_display, self->window, &size, &ret)) {
         memcpy(&staging, self, sizeof(ObClient));
 
         /* normal windows can't request placement! har har

@@ -66,7 +66,7 @@ int main (int argc, char **argv) {
     sleep(1);
 
     hints.flags = 2;
-    hints.decorations = 1<<3 || 1 << 1; /* border and title */
+    hints.decorations = (1 << 3) | (1 << 1); /* border and title */
     prop = XInternAtom(display, "_MOTIF_WM_HINTS", False);
     XChangeProperty(display, win, prop, prop, 32, PropModeReplace,
                     (unsigned char *)&hints, 5);
