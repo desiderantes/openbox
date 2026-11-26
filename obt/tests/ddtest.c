@@ -34,18 +34,14 @@ exit
 
 gint main(int argc, char **argv)
 {
-    ObtPaths *obtpaths;
     ObtLink *dd;
-    gchar *id;
 
     if (argc < 2) {
         g_print("pass path to .desktop\n");
         return 1;
     }
 
-    obtpaths = obt_paths_new();
-    dd = obt_link_from_ddfile(argv[1], obtpaths, "et", NULL, NULL);
-    obt_paths_unref(obtpaths);
+    dd = obt_link_from_ddfile(argv[1], NULL);
     if (dd) {
         g_print("Success\n");
         {

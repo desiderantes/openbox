@@ -31,7 +31,6 @@ install_headers(
 )
 
 obt_sources = files(
-    'ddparse.c',
     'display.c',
     'keyboard.c',
     'link.c',
@@ -99,6 +98,7 @@ obt_unittests = executable(
     'obt_unittests',
     files(
         'bsearch_unittest.c',
+        'link_unittest.c',
         'paths_unittest.c',
         'unittest_base.c',
     ),
