@@ -22,6 +22,6 @@
 
 #include "render.h"
 
-void RrRender(RrAppearance *a, gint w, gint h);
+RR_API void RrRender(RrAppearance *a, gint w, gint h);
 
 #endif /* __gradient_h */

@@ -74,6 +74,7 @@ libobrender = library(
     obrender_sources,
     version: rr_so_version,
     soversion: rr_soversion,
+    gnu_symbol_visibility: 'hidden',
     include_directories: root_inc,
     dependencies: obrender_deps,
     c_args: [

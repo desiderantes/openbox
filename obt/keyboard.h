@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include "obt/version.h"
 
 G_BEGIN_DECLS
 
@@ -44,39 +45,39 @@ typedef enum {
 
 typedef struct _ObtIC ObtIC;
 
-void obt_keyboard_reload(void);
+OBT_API void obt_keyboard_reload(void);
 
 /*! Get the modifier mask(s) for a keyboard event.
   (eg. a keycode bound to Alt_L could return a mask of (Mod1Mask | Mask3Mask))
 */
-guint obt_keyboard_keyevent_to_modmask(XEvent *e);
+OBT_API guint obt_keyboard_keyevent_to_modmask(XEvent *e);
 
 /*! Strip off all modifiers except for the modifier keys. This strips stuff
   like Button1Mask, and also LockMask, NumlockMask, and ScrolllockMask */
-guint obt_keyboard_only_modmasks(guint mask);
+OBT_API guint obt_keyboard_only_modmasks(guint mask);
 
 /*! Get the modifier masks for a modifier key. This includes both the left and
   right keys when there are both. */
-guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
+OBT_API guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
 
 /*! Convert a KeySym to all the KeyCodes which generate it. */
-KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
+OBT_API KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
 
 /*! Translate a KeyPress event to the unicode character it represents */
-gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev);
+OBT_API gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev);
 
 /*! Translate a KeyPress event to the KeySym that it represents.  Use this
  for control keys, not for getting text input! */
-KeySym obt_keyboard_keypress_to_keysym(XEvent *ev);
+OBT_API KeySym obt_keyboard_keypress_to_keysym(XEvent *ev);
 
 /*! Create an input context for a window.
     @client The top-level client window for the input context.
     @focus The subwindow within the client for the input context.
 */
-ObtIC* obt_keyboard_context_new(Window client, Window focus);
+OBT_API ObtIC* obt_keyboard_context_new(Window client, Window focus);
 
-void obt_keyboard_context_ref(ObtIC *ic);
-void obt_keyboard_context_unref(ObtIC *ic);
+OBT_API void obt_keyboard_context_ref(ObtIC *ic);
+OBT_API void obt_keyboard_context_unref(ObtIC *ic);
 
 G_END_DECLS
 

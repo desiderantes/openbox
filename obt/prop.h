@@ -22,6 +22,7 @@
 
 #include <X11/Xlib.h>
 #include <glib.h>
+#include "obt/version.h"
 
 G_BEGIN_DECLS
 
@@ -227,7 +228,7 @@ typedef enum {
     OBT_PROP_NUM_ATOMS
 } ObtPropAtom;
 
-Atom obt_prop_atom(ObtPropAtom a);
+OBT_API Atom obt_prop_atom(ObtPropAtom a);
 
 typedef enum {
     /*! STRING is latin1 encoded.  It cannot contain control characters except
@@ -247,30 +248,30 @@ typedef enum {
     OBT_PROP_TEXT_UTF8_STRING = 5,
 } ObtPropTextType;
 
-gboolean obt_prop_get32(Window win, Atom prop, Atom type, guint32 *ret);
-gboolean obt_prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
-                              guint *nret);
+OBT_API gboolean obt_prop_get32(Window win, Atom prop, Atom type, guint32 *ret);
+OBT_API gboolean obt_prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
+                                      guint *nret);
 
-gboolean obt_prop_get_text(Window win, Atom prop, ObtPropTextType type,
-                           gchar **ret);
-gboolean obt_prop_get_array_text(Window win, Atom prop,
-                                 ObtPropTextType type,
-                                 gchar ***ret);
+OBT_API gboolean obt_prop_get_text(Window win, Atom prop, ObtPropTextType type,
+                                   gchar **ret);
+OBT_API gboolean obt_prop_get_array_text(Window win, Atom prop,
+                                         ObtPropTextType type,
+                                         gchar ***ret);
 
-void obt_prop_set32(Window win, Atom prop, Atom type, gulong val);
-void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
-                          guint num);
-void obt_prop_set_text(Window win, Atom prop, const gchar *str);
-void obt_prop_set_array_text(Window win, Atom prop, const gchar *const *strs);
+OBT_API void obt_prop_set32(Window win, Atom prop, Atom type, gulong val);
+OBT_API void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
+                                  guint num);
+OBT_API void obt_prop_set_text(Window win, Atom prop, const gchar *str);
+OBT_API void obt_prop_set_array_text(Window win, Atom prop, const gchar *const *strs);
 
-void obt_prop_erase(Window win, Atom prop);
+OBT_API void obt_prop_erase(Window win, Atom prop);
 
-void obt_prop_message(gint screen, Window about, Atom messagetype,
-                      glong data0, glong data1, glong data2, glong data3,
-                      glong data4, glong mask);
-void obt_prop_message_to(Window to, Window about, Atom messagetype,
-                         glong data0, glong data1, glong data2, glong data3,
-                         glong data4, glong mask);
+OBT_API void obt_prop_message(gint screen, Window about, Atom messagetype,
+                              glong data0, glong data1, glong data2, glong data3,
+                              glong data4, glong mask);
+OBT_API void obt_prop_message_to(Window to, Window about, Atom messagetype,
+                                 glong data0, glong data1, glong data2, glong data3,
+                                 glong data4, glong mask);
 
 #define OBT_PROP_ATOM(prop) obt_prop_atom(OBT_PROP_##prop)
 

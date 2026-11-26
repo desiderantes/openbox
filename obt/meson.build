@@ -65,6 +65,7 @@ libobt = library(
     obt_sources,
     version: obt_so_version,
     soversion: obt_soversion,
+    gnu_symbol_visibility: 'hidden',
     include_directories: root_inc,
     implicit_include_directories: false,
     dependencies: obt_deps,

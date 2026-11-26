@@ -21,6 +21,7 @@
 
 #include <libxml/parser.h>
 #include <glib.h>
+#include "obt/version.h"
 
 G_BEGIN_DECLS
 
@@ -28,71 +29,71 @@ typedef struct _ObtXmlInst ObtXmlInst;
 
 typedef void (*ObtXmlCallback)(xmlNodePtr node, gpointer data);
 
-ObtXmlInst* obt_xml_instance_new(void);
-void obt_xml_instance_ref(ObtXmlInst *inst);
-void obt_xml_instance_unref(ObtXmlInst *inst);
+OBT_API ObtXmlInst* obt_xml_instance_new(void);
+OBT_API void obt_xml_instance_ref(ObtXmlInst *inst);
+OBT_API void obt_xml_instance_unref(ObtXmlInst *inst);
 
-gboolean obt_xml_load_file(ObtXmlInst *inst,
-                           const gchar *path,
-                           const gchar *root_node);
-gboolean obt_xml_load_config_file(ObtXmlInst *inst,
-                                  const gchar *domain,
-                                  const gchar *filename,
-                                  const gchar *root_node);
-gboolean obt_xml_load_data_file(ObtXmlInst *inst,
-                                const gchar *domain,
-                                const gchar *filename,
-                                const gchar *root_node);
-gboolean obt_xml_load_theme_file(ObtXmlInst *inst,
-                                 const gchar *theme,
-                                 const gchar *domain,
-                                 const gchar *filename,
-                                 const gchar *root_node);
-gboolean obt_xml_load_mem(ObtXmlInst *inst,
-                          gpointer data, guint len, const gchar *root_node);
+OBT_API gboolean obt_xml_load_file(ObtXmlInst *inst,
+                                   const gchar *path,
+                                   const gchar *root_node);
+OBT_API gboolean obt_xml_load_config_file(ObtXmlInst *inst,
+                                          const gchar *domain,
+                                          const gchar *filename,
+                                          const gchar *root_node);
+OBT_API gboolean obt_xml_load_data_file(ObtXmlInst *inst,
+                                        const gchar *domain,
+                                        const gchar *filename,
+                                        const gchar *root_node);
+OBT_API gboolean obt_xml_load_theme_file(ObtXmlInst *inst,
+                                         const gchar *theme,
+                                         const gchar *domain,
+                                         const gchar *filename,
+                                         const gchar *root_node);
+OBT_API gboolean obt_xml_load_mem(ObtXmlInst *inst,
+                                  gpointer data, guint len, const gchar *root_node);
 
 /* Returns true if an error is present. */
-gboolean obt_xml_last_error(ObtXmlInst *inst);
-gchar* obt_xml_last_error_file(ObtXmlInst *inst);
-gint obt_xml_last_error_line(ObtXmlInst *inst);
-gchar* obt_xml_last_error_message(ObtXmlInst *inst);
+OBT_API gboolean obt_xml_last_error(ObtXmlInst *inst);
+OBT_API gchar* obt_xml_last_error_file(ObtXmlInst *inst);
+OBT_API gint obt_xml_last_error_line(ObtXmlInst *inst);
+OBT_API gchar* obt_xml_last_error_message(ObtXmlInst *inst);
 
-gboolean obt_xml_save_file(ObtXmlInst *inst,
-                           const gchar *path,
-                           gboolean pretty);
+OBT_API gboolean obt_xml_save_file(ObtXmlInst *inst,
+                                   const gchar *path,
+                                   gboolean pretty);
 
-xmlDocPtr obt_xml_doc(ObtXmlInst *inst);
-xmlNodePtr obt_xml_root(ObtXmlInst *inst);
+OBT_API xmlDocPtr obt_xml_doc(ObtXmlInst *inst);
+OBT_API xmlNodePtr obt_xml_root(ObtXmlInst *inst);
 
-void obt_xml_close(ObtXmlInst *inst);
+OBT_API void obt_xml_close(ObtXmlInst *inst);
 
-void obt_xml_register(ObtXmlInst *inst, const gchar *tag,
-                      ObtXmlCallback func, gpointer data);
-void obt_xml_unregister(ObtXmlInst *inst, const gchar *tag);
-void obt_xml_tree(ObtXmlInst *i, xmlNodePtr node);
-void obt_xml_tree_from_root(ObtXmlInst *i);
+OBT_API void obt_xml_register(ObtXmlInst *inst, const gchar *tag,
+                              ObtXmlCallback func, gpointer data);
+OBT_API void obt_xml_unregister(ObtXmlInst *inst, const gchar *tag);
+OBT_API void obt_xml_tree(ObtXmlInst *i, xmlNodePtr node);
+OBT_API void obt_xml_tree_from_root(ObtXmlInst *i);
 
 
 /* helpers */
 
-xmlNodePtr obt_xml_find_node   (xmlNodePtr node, const gchar *name);
+OBT_API xmlNodePtr obt_xml_find_node   (xmlNodePtr node, const gchar *name);
 
-gboolean obt_xml_node_contains (xmlNodePtr node, const gchar *val);
-gchar   *obt_xml_node_string_unstripped(xmlNodePtr node);
-gchar   *obt_xml_node_string   (xmlNodePtr node);
-gint     obt_xml_node_int      (xmlNodePtr node);
-gboolean obt_xml_node_bool     (xmlNodePtr node);
+OBT_API gboolean obt_xml_node_contains (xmlNodePtr node, const gchar *val);
+OBT_API gchar   *obt_xml_node_string_unstripped(xmlNodePtr node);
+OBT_API gchar   *obt_xml_node_string   (xmlNodePtr node);
+OBT_API gint     obt_xml_node_int      (xmlNodePtr node);
+OBT_API gboolean obt_xml_node_bool     (xmlNodePtr node);
 
-gboolean obt_xml_attr_contains (xmlNodePtr node, const gchar *name,
-                                const gchar *val);
-gboolean obt_xml_attr_string_unstripped(xmlNodePtr node, const gchar *name,
+OBT_API gboolean obt_xml_attr_contains (xmlNodePtr node, const gchar *name,
+                                        const gchar *val);
+OBT_API gboolean obt_xml_attr_string_unstripped(xmlNodePtr node, const gchar *name,
+                                                gchar **value);
+OBT_API gboolean obt_xml_attr_string   (xmlNodePtr node, const gchar *name,
                                         gchar **value);
-gboolean obt_xml_attr_string   (xmlNodePtr node, const gchar *name,
-                                gchar **value);
-gboolean obt_xml_attr_int      (xmlNodePtr node, const gchar *name,
-                                gint *value);
-gboolean obt_xml_attr_bool     (xmlNodePtr node, const gchar *name,
-                                gboolean *value);
+OBT_API gboolean obt_xml_attr_int      (xmlNodePtr node, const gchar *name,
+                                        gint *value);
+OBT_API gboolean obt_xml_attr_bool     (xmlNodePtr node, const gchar *name,
+                                        gboolean *value);
 
 G_END_DECLS
 

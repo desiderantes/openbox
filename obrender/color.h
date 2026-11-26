@@ -43,9 +43,9 @@ struct _RrColor {
 #endif
 };
 
-void RrColorAllocateGC(RrColor *in);
-XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b);
-void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im);
-void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im);
+RR_API void RrColorAllocateGC(RrColor *in);
+RR_API XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b);
+RR_API void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im);
+RR_API void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im);
 
 #endif /* __color_h */

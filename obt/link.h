@@ -20,6 +20,7 @@
 #define __obt_link_h
 
 #include <glib.h>
+#include "obt/version.h"
 
 G_BEGIN_DECLS
 
@@ -62,19 +63,19 @@ typedef enum {
 
 typedef struct _ObtLink     ObtLink;
 
-ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths,
-                              struct _ObtPaths *p);
+OBT_API ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths,
+                                      struct _ObtPaths *p);
 
-void obt_link_ref(ObtLink *e);
-void obt_link_unref(ObtLink *e);
+OBT_API void obt_link_ref(ObtLink *e);
+OBT_API void obt_link_unref(ObtLink *e);
 
 /*! Returns TRUE if the file exists but says it should be ignored, with
     the Hidden flag.  No other functions can be used for the ObtLink
     in this case. */
-gboolean obt_link_deleted (ObtLink *e);
+OBT_API gboolean obt_link_deleted (ObtLink *e);
 
 /*! Returns the type of object refered to by the .desktop file. */
-ObtLinkType obt_link_type (ObtLink *e);
+OBT_API ObtLinkType obt_link_type (ObtLink *e);
 
 /*! Returns TRUE if the .desktop file should be displayed to users, given the
     current environment.  If FALSE, the .desktop file should not be showed.
@@ -82,33 +83,33 @@ ObtLinkType obt_link_type (ObtLink *e);
     @env A semicolon-deliminated list of environemnts.  Can be one or more of:
          GNOME, KDE, ROX, XFCE.  Other environments not listed here may also
          be supported.  This can be null also if not listing any environment. */
-gboolean obt_link_display(ObtLink *e, const gchar *env);
+OBT_API gboolean obt_link_display(ObtLink *e, const gchar *env);
 
-const gchar* obt_link_name           (ObtLink *e);
-const gchar* obt_link_generic_name   (ObtLink *e);
-const gchar* obt_link_comment        (ObtLink *e);
+OBT_API const gchar* obt_link_name           (ObtLink *e);
+OBT_API const gchar* obt_link_generic_name   (ObtLink *e);
+OBT_API const gchar* obt_link_comment        (ObtLink *e);
 /*! Returns the icon for the object referred to by the .desktop file.
     Returns either an absolute path, or a string which can be used to find the
     icon using the algorithm given by:
     http://freedesktop.org/wiki/Specifications/icon-theme-spec?action=show&redirect=Standards/icon-theme-spec
 */
-const gchar* obt_link_icon           (ObtLink *e);
+OBT_API const gchar* obt_link_icon           (ObtLink *e);
 
-const gchar *obt_link_url_path(ObtLink *e);
+OBT_API const gchar *obt_link_url_path(ObtLink *e);
 
-const gchar*  obt_link_app_executable      (ObtLink *e);
+OBT_API const gchar*  obt_link_app_executable      (ObtLink *e);
 /*! Returns the path in which the application should be run */
-const gchar*  obt_link_app_path            (ObtLink *e);
-gboolean      obt_link_app_run_in_terminal (ObtLink *e);
-const gchar*const* obt_link_app_mime_types      (ObtLink *e);
-const GQuark* obt_link_app_categories      (ObtLink *e, gulong *n);
+OBT_API const gchar*  obt_link_app_path            (ObtLink *e);
+OBT_API gboolean      obt_link_app_run_in_terminal (ObtLink *e);
+OBT_API const gchar*const* obt_link_app_mime_types      (ObtLink *e);
+OBT_API const GQuark* obt_link_app_categories      (ObtLink *e, gulong *n);
 /*! Returns a combination of values in the ObtLinkAppOpen enum,
     specifying if the application can be launched to open one or more files
     and URLs. */
-ObtLinkAppOpen obt_link_app_open(ObtLink *e);
+OBT_API ObtLinkAppOpen obt_link_app_open(ObtLink *e);
 
-ObtLinkAppStartup obt_link_app_startup_notify(ObtLink *e);
-const gchar* obt_link_app_startup_wmclass(ObtLink *e);
+OBT_API ObtLinkAppStartup obt_link_app_startup_notify(ObtLink *e);
+OBT_API const gchar* obt_link_app_startup_wmclass(ObtLink *e);
 
 
 G_END_DECLS

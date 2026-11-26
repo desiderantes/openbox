@@ -12,4 +12,12 @@
      (RR_MAJOR_VERSION == (major) && RR_MINOR_VERSION == (minor) && \
       RR_MICRO_VERSION >= (micro)))
 
+#ifndef RR_API
+#  if defined(__GNUC__) && __GNUC__ >= 4
+#    define RR_API __attribute__((visibility("default")))
+#  else
+#    define RR_API
+#  endif
+#endif
+
 #endif

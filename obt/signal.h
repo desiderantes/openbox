@@ -20,6 +20,7 @@
 #define __obt_signal_h
 
 #include <glib.h>
+#include "obt/version.h"
 
 G_BEGIN_DECLS
 
@@ -29,17 +30,17 @@ typedef void (*ObtSignalHandler)(gint signal, gpointer data);
    main program thread (except signals that require immediate exit).
    The app should not set its own signal handler function or it will interfere
    with this one. */
-void obt_signal_listen(void);
+OBT_API void obt_signal_listen(void);
 /*! Stop listening to signals and clean up */
-void obt_signal_stop(void);
+OBT_API void obt_signal_stop(void);
 
 /*! Adds a signal handler for a signal.  The callback function @func will be
   called when the signal @sig is fired.  @sig must not be a signal that
   would cause the core to dump as these are handled internally.
  */
-void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data);
+OBT_API void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data);
 /*! Removes the most recently added callback with the given function. */
-void obt_signal_remove_callback(gint sig, ObtSignalHandler func);
+OBT_API void obt_signal_remove_callback(gint sig, ObtSignalHandler func);
 
 G_END_DECLS
 

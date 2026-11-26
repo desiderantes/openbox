@@ -22,6 +22,7 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 #include <pango/pangoxft.h>
+#include "obrender/version.h"
 
 struct _RrInstance {
     Display *display;
@@ -50,8 +51,8 @@ struct _RrInstance {
     GHashTable *color_hash;
 };
 
-guint       RrPseudoBPC    (const RrInstance *inst);
-XColor*     RrPseudoColors (const RrInstance *inst);
-GHashTable* RrColorHash    (const RrInstance *inst);
+RR_API guint       RrPseudoBPC    (const RrInstance *inst);
+RR_API XColor*     RrPseudoColors (const RrInstance *inst);
+RR_API GHashTable* RrColorHash    (const RrInstance *inst);
 
 #endif

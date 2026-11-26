@@ -345,83 +345,83 @@ struct _RrButton {
 #define RrDefaultFontWeight       RR_FONTWEIGHT_NORMAL
 #define RrDefaultFontSlant        RR_FONTSLANT_NORMAL
 
-RrInstance* RrInstanceNew (Display *display, gint screen);
-void        RrInstanceFree (RrInstance *inst);
+RR_API RrInstance* RrInstanceNew (Display *display, gint screen);
+RR_API void        RrInstanceFree (RrInstance *inst);
 
-Display* RrDisplay      (const RrInstance *inst);
-gint     RrScreen       (const RrInstance *inst);
-Window   RrRootWindow   (const RrInstance *inst);
-Visual*  RrVisual       (const RrInstance *inst);
-gint     RrDepth        (const RrInstance *inst);
-Colormap RrColormap     (const RrInstance *inst);
-gint     RrRedOffset    (const RrInstance *inst);
-gint     RrGreenOffset  (const RrInstance *inst);
-gint     RrBlueOffset   (const RrInstance *inst);
-gint     RrRedShift     (const RrInstance *inst);
-gint     RrGreenShift   (const RrInstance *inst);
-gint     RrBlueShift    (const RrInstance *inst);
-gint     RrRedMask      (const RrInstance *inst);
-gint     RrGreenMask    (const RrInstance *inst);
-gint     RrBlueMask     (const RrInstance *inst);
+RR_API Display* RrDisplay      (const RrInstance *inst);
+RR_API gint     RrScreen       (const RrInstance *inst);
+RR_API Window   RrRootWindow   (const RrInstance *inst);
+RR_API Visual*  RrVisual       (const RrInstance *inst);
+RR_API gint     RrDepth        (const RrInstance *inst);
+RR_API Colormap RrColormap     (const RrInstance *inst);
+RR_API gint     RrRedOffset    (const RrInstance *inst);
+RR_API gint     RrGreenOffset  (const RrInstance *inst);
+RR_API gint     RrBlueOffset   (const RrInstance *inst);
+RR_API gint     RrRedShift     (const RrInstance *inst);
+RR_API gint     RrGreenShift   (const RrInstance *inst);
+RR_API gint     RrBlueShift    (const RrInstance *inst);
+RR_API gint     RrRedMask      (const RrInstance *inst);
+RR_API gint     RrGreenMask    (const RrInstance *inst);
+RR_API gint     RrBlueMask     (const RrInstance *inst);
 
-RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
-RrColor *RrColorCopy  (RrColor *c);
-RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);
-void     RrColorFree  (RrColor *in);
+RR_API RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
+RR_API RrColor *RrColorCopy  (RrColor *c);
+RR_API RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);
+RR_API void     RrColorFree  (RrColor *in);
 
-gint     RrColorRed   (const RrColor *c);
-gint     RrColorGreen (const RrColor *c);
-gint     RrColorBlue  (const RrColor *c);
-gulong   RrColorPixel (const RrColor *c);
-GC       RrColorGC    (RrColor *c);
+RR_API gint     RrColorRed   (const RrColor *c);
+RR_API gint     RrColorGreen (const RrColor *c);
+RR_API gint     RrColorBlue  (const RrColor *c);
+RR_API gulong   RrColorPixel (const RrColor *c);
+RR_API GC       RrColorGC    (RrColor *c);
 
-RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
-RrAppearance *RrAppearanceCopy (RrAppearance *a);
-void          RrAppearanceFree (RrAppearance *a);
-void          RrAppearanceRemoveTextures(RrAppearance *a);
-void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
+RR_API RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
+RR_API RrAppearance *RrAppearanceCopy (RrAppearance *a);
+RR_API void          RrAppearanceFree (RrAppearance *a);
+RR_API void          RrAppearanceRemoveTextures(RrAppearance *a);
+RR_API void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
 /*! Always call this when changing the type of a texture in an appearance */
-void          RrAppearanceClearTextures(RrAppearance *a);
+RR_API void          RrAppearanceClearTextures(RrAppearance *a);
 
-RrButton *RrButtonNew (const RrInstance *inst);
-void      RrButtonFree(RrButton *b);
+RR_API RrButton *RrButtonNew (const RrInstance *inst);
+RR_API void      RrButtonFree(RrButton *b);
 
-RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
-                             gint size, RrFontWeight weight, RrFontSlant slant);
-RrFont *RrFontOpenDefault   (const RrInstance *inst);
-void    RrFontClose         (RrFont *f);
+RR_API RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
+                                    gint size, RrFontWeight weight, RrFontSlant slant);
+RR_API RrFont *RrFontOpenDefault   (const RrInstance *inst);
+RR_API void    RrFontClose         (RrFont *f);
 /*! Returns an RrSize, that was allocated with g_slice_new().  Use g_slice_free() to
   free it. */
-RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
-                             gint shadow_offset_x, gint shadow_offset_y,
-                             gboolean flow, gint maxwidth);
-gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
-gint    RrFontMaxCharWidth  (const RrFont *f);
+RR_API RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
+                                    gint shadow_offset_x, gint shadow_offset_y,
+                                    gboolean flow, gint maxwidth);
+RR_API gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
+RR_API gint    RrFontMaxCharWidth  (const RrFont *f);
 /*! Select a font from a pango description string */
-void    RrFontDescriptionFromString(RrFont *font, gchar *description);
+RR_API void    RrFontDescriptionFromString(RrFont *font, gchar *description);
 
 /* Paint into the appearance. The old pixmap is returned (if there was one). It
    is the responsibility of the caller to call XFreePixmap on the return when
    it is non-null. */
-Pixmap RrPaintPixmap (RrAppearance *a, gint w, gint h);
-void   RrPaint       (RrAppearance *a, Window win, gint w, gint h);
-void   RrMinSize     (RrAppearance *a, gint *w, gint *h);
-gint   RrMinWidth    (RrAppearance *a);
+RR_API Pixmap RrPaintPixmap (RrAppearance *a, gint w, gint h);
+RR_API void   RrPaint       (RrAppearance *a, Window win, gint w, gint h);
+RR_API void   RrMinSize     (RrAppearance *a, gint *w, gint *h);
+RR_API gint   RrMinWidth    (RrAppearance *a);
 /* For text textures, if flow is TRUE, then the string must be set before
    calling this, otherwise it doesn't need to be */
-gint   RrMinHeight   (RrAppearance *a);
-void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
+RR_API gint   RrMinHeight   (RrAppearance *a);
+RR_API void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 
-gboolean RrPixmapToRGBA(const RrInstance *inst,
-                        Pixmap pmap, Pixmap mask,
-                        gint *w, gint *h, RrPixel32 **data);
+RR_API gboolean RrPixmapToRGBA(const RrInstance *inst,
+                               Pixmap pmap, Pixmap mask,
+                               gint *w, gint *h, RrPixel32 **data);
 
 /*! Create a new image cache for RrImages.
   @param max_resized_saved The number of resized copies of an image to save
 */
-RrImageCache* RrImageCacheNew(gint max_resized_saved);
-void          RrImageCacheRef(RrImageCache *self);
-void          RrImageCacheUnref(RrImageCache *self);
+RR_API RrImageCache* RrImageCacheNew(gint max_resized_saved);
+RR_API void          RrImageCacheRef(RrImageCache *self);
+RR_API void          RrImageCacheUnref(RrImageCache *self);
 
 /*! Create a new image, or return one from the cache that matches.
   @param cache The image cache.
@@ -433,7 +433,7 @@ void          RrImageCacheUnref(RrImageCache *self);
   @return Returns NULL if unable to load an image by the name and it is not in
     the cache already
 */
-RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name);
+RR_API RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name);
 
 /*! Create a new image, or return one from the cache that matches.
   @param cache The image cache.
@@ -444,8 +444,8 @@ RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name);
   @return Returns NULL if unable to load an image by the name and it is not in
     the cache already
 */
-RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
-                            gint w, gint h);
+RR_API RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
+                                   gint w, gint h);
 
 /*! Add a new size of a picture to an image.
   If a picture has multiple versions of different sizes (example 16x16, 32x32
@@ -454,10 +454,10 @@ RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
   others in the RrImage - classifying them as being the same logical image at a
   different dimention.
 */
-void RrImageAddFromData(RrImage *image, RrPixel32 *data, gint w, gint h);
+RR_API void RrImageAddFromData(RrImage *image, RrPixel32 *data, gint w, gint h);
 
-void RrImageRef(RrImage *im);
-void RrImageUnref(RrImage *im);
+RR_API void RrImageRef(RrImage *im);
+RR_API void RrImageUnref(RrImage *im);
 
 G_END_DECLS
 

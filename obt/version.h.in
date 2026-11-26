@@ -12,4 +12,12 @@
      (OBT_MAJOR_VERSION == (major) && OBT_MINOR_VERSION == (minor) && \
       OBT_MICRO_VERSION >= (micro)))
 
+#ifndef OBT_API
+#  if defined(__GNUC__) && __GNUC__ >= 4
+#    define OBT_API __attribute__((visibility("default")))
+#  else
+#    define OBT_API
+#  endif
+#endif
+
 #endif

@@ -33,10 +33,10 @@ struct _RrFont {
     gint descent; /*!< The font's descent in pango-units */
 };
 
-void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
+RR_API void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
 
 /*! Increment the references for this font, RrFontClose will decrement until 0
   and then really close it */
-void RrFontRef(RrFont *f);
+RR_API void RrFontRef(RrFont *f);
 
 #endif /* __font_h */
