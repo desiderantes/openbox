@@ -38,7 +38,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
 
     if ((n = obt_xml_find_node(node, "left")))
         xml_node_relative(n, &o->left, &o->left_denom);
@@ -56,7 +56,7 @@ static gpointer setup_func(xmlNodePtr node)
 
 static void free_func(gpointer o)
 {
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

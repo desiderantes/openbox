@@ -141,7 +141,7 @@ static void client_call_notifies(ObClient *self, GSList *list)
 
 void client_add_destroy_notify(ObClientCallback func, gpointer data)
 {
-    ClientCallback *d = g_slice_new(ClientCallback);
+    ClientCallback *d = g_new(ClientCallback, 1);
     d->func = func;
     d->data = data;
     client_destroy_notifies = g_slist_prepend(client_destroy_notifies, d);
@@ -154,7 +154,7 @@ void client_remove_destroy_notify(ObClientCallback func)
     for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
         if (d->func == func) {
-            g_slice_free(ClientCallback, d);
+            g_free(d);
             client_destroy_notifies =
                 g_slist_delete_link(client_destroy_notifies, it);
             break;
@@ -169,7 +169,7 @@ void client_remove_destroy_notify_data(ObClientCallback func, gpointer data)
     for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
         if (d->func == func && d->data == data) {
-            g_slice_free(ClientCallback, d);
+            g_free(d);
             client_destroy_notifies =
                 g_slist_delete_link(client_destroy_notifies, it);
             break;
@@ -227,7 +227,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* create the ObClient struct, and populate it from the hints on the
        window */
-    self = g_slice_new0(ObClient);
+    self = g_new0(ObClient, 1);
     self->obwin.type = OB_WINDOW_CLASS_CLIENT;
     self->window = window;
     self->prompt = prompt;
@@ -383,7 +383,7 @@ void client_manage(Window window, ObPrompt *prompt)
                 place.y = r->y;
                 ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
             }
-            g_slice_free(Rect, r);
+            g_free(r);
         }
 
         /* make sure the window is visible. */
@@ -453,7 +453,7 @@ void client_manage(Window window, ObPrompt *prompt)
         place.width -= self->frame->size.left + self->frame->size.right;
         place.height -= self->frame->size.top + self->frame->size.bottom;
 
-        g_slice_free(Rect, a);
+        g_free(a);
     }
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
@@ -529,7 +529,7 @@ void client_manage(Window window, ObPrompt *prompt)
     client_set_list();
 
     /* free the ObAppSettings shallow copy */
-    g_slice_free(ObAppSettings, settings);
+    g_free(settings);
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
              window, self->frame->window, self->class);
@@ -544,7 +544,7 @@ ObClient *client_fake_manage(Window window)
 
     /* do this minimal stuff to figure out the client's decorations */
 
-    self = g_slice_new0(ObClient);
+    self = g_new0(ObClient, 1);
     self->window = window;
 
     client_get_all(self, FALSE);
@@ -563,7 +563,7 @@ ObClient *client_fake_manage(Window window)
              self->frame->size.top, self->frame->size.bottom);
 
     /* free the ObAppSettings shallow copy */
-    g_slice_free(ObAppSettings, settings);
+    g_free(settings);
 
     return self;
 }
@@ -724,7 +724,7 @@ void client_unmanage(ObClient *self)
     g_free(self->group_class);
     g_free(self->client_machine);
     g_free(self->sm_client_id);
-    g_slice_free(ObClient, self);
+    g_free(self);
 }
 
 void client_fake_unmanage(ObClient *self)
@@ -732,7 +732,7 @@ void client_fake_unmanage(ObClient *self)
     /* this is all that got allocated to get the decorations */
 
     frame_free(self->frame);
-    g_slice_free(ObClient, self);
+    g_free(self);
 }
 
 static gboolean client_can_steal_focus(ObClient *self,
@@ -1189,7 +1189,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         if (rudeb && !self->strut.bottom && *y + fh > a->y + a->height)
             *y = a->y + MAX(0, a->height - fh);
 
-        g_slice_free(Rect, a);
+        g_free(a);
     }
 
     /* get where the client should be */
@@ -3102,7 +3102,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         user = FALSE; /* ignore if the client can't be moved/resized when it
                          is maximizing */
 
-        g_slice_free(Rect, a);
+        g_free(a);
     }
 
     /* gets the client's position */
@@ -4507,7 +4507,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
         Rect *area = screen_area(self->desktop, i, NULL);
         detect_edge(*area, dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
-        g_slice_free(Rect, area);
+        g_free(area);
     }
 
     /* search for edges of clients */
@@ -4532,7 +4532,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
                 my_edge_size, dest, near_edge);
 
-    g_slice_free(Rect, a);
+    g_free(a);
 }
 
 void client_find_move_directional(ObClient *self, ObDirection dir,

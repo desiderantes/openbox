@@ -200,7 +200,7 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
 {
   RrAppearance *out;
 
-  out = g_slice_new0(RrAppearance);
+  out = g_new0(RrAppearance, 1);
   out->inst = inst;
   out->textures = numtex;
   out->surface.bevel_light_adjust = 128;
@@ -234,7 +234,7 @@ void RrAppearanceClearTextures(RrAppearance *a)
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
-    RrAppearance *copy = g_slice_new(RrAppearance);
+    RrAppearance *copy = g_new(RrAppearance, 1);
 
     copy->inst = orig->inst;
 
@@ -336,7 +336,7 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->split_secondary);
         g_free(p->pixel_data);
         p->pixel_data = NULL;
-        g_slice_free(RrAppearance, a);
+        g_free(a);
     }
 }
 
@@ -419,7 +419,7 @@ gint RrMinWidth(RrAppearance *a)
                                     a->texture[i].data.text.flow,
                                     a->texture[i].data.text.maxwidth);
             w = MAX(w, m->width);
-            g_slice_free(RrSize, m);
+            g_free(m);
             break;
         case RR_TEXTURE_RGBA:
             w += MAX(w, a->texture[i].data.rgba.width);
@@ -470,7 +470,7 @@ gint RrMinHeight(RrAppearance *a)
                      a->texture[i].data.text.flow,
                      a->texture[i].data.text.maxwidth);
                 h += MAX(h, m->height);
-                g_slice_free(RrSize, m);
+                g_free(m);
             }
             else
                 h += MAX(h,

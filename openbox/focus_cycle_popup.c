@@ -221,7 +221,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
         g_free(t->text);
         XDestroyWindow(obt_display, t->iconwin);
         XDestroyWindow(obt_display, t->textwin);
-        g_slice_free(ObFocusCyclePopupTarget, t);
+        g_free(t);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
@@ -247,7 +247,7 @@ static void popup_target_free(ObFocusCyclePopupTarget *t)
     g_free(t->text);
     XDestroyWindow(obt_display, t->iconwin);
     XDestroyWindow(obt_display, t->textwin);
-    g_slice_free(ObFocusCyclePopupTarget, t);
+    g_free(t);
 }
 
 static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
@@ -317,7 +317,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                     g_free(text);
                 } else {
                     ObFocusCyclePopupTarget *t =
-                        g_slice_new(ObFocusCyclePopupTarget);
+                        g_new(ObFocusCyclePopupTarget, 1);
 
                     t->client = ft;
                     t->text = text;

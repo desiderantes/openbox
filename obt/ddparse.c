@@ -92,12 +92,12 @@ static void parse_value_free(ObtDDParseValue *v)
     default:
         g_assert_not_reached();
     }
-    g_slice_free(ObtDDParseValue, v);
+    g_free(v);
 }
 
 static ObtDDParseGroup* parse_group_new(gchar *name, ObtDDParseValueFunc f)
 {
-    ObtDDParseGroup *g = g_slice_new(ObtDDParseGroup);
+    ObtDDParseGroup *g = g_new(ObtDDParseGroup, 1);
     g->name = name;
     g->value_func = f;
     g->seen = FALSE;
@@ -111,7 +111,7 @@ static void parse_group_free(ObtDDParseGroup *g)
 {
     g_free(g->name);
     g_hash_table_destroy(g->key_hash);
-    g_slice_free(ObtDDParseGroup, g);
+    g_free(g);
 }
 
 /*! Reads an input string, strips out invalid stuff, and parses
@@ -737,7 +737,7 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         g_assert_not_reached();
     }
 
-    pv = g_slice_new(ObtDDParseValue);
+    pv = g_new(ObtDDParseValue, 1);
     *pv = v;
     g_hash_table_insert(parse->group->key_hash, key, pv);
     return TRUE;

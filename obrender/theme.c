@@ -180,7 +180,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     fbs.unfocused_pressed = RrAppearanceNew(inst, 1);
 
     /* initialize theme */
-    theme = g_slice_new0(RrTheme);
+    theme = g_new0(RrTheme, 1);
 
     theme->inst = inst;
     theme->name = g_strdup(name ? name : DEFAULT_THEME);
@@ -1116,7 +1116,7 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->osd_unpressed_button);
         RrAppearanceFree(theme->osd_focused_button);
 
-        g_slice_free(RrTheme, theme);
+        g_free(theme);
     }
 }
 

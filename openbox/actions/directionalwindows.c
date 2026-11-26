@@ -135,7 +135,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     o->dialog = TRUE;
     o->bar = TRUE;
 
@@ -225,7 +225,7 @@ static void free_func(gpointer options)
         o->actions = g_slist_delete_link(o->actions, o->actions);
     }
 
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 static gboolean run_func(ObActionsData *data, gpointer options)

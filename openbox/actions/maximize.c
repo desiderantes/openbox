@@ -53,7 +53,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     o->dir = BOTH;
 
     if ((n = obt_xml_find_node(node, "direction"))) {
@@ -72,7 +72,7 @@ static gpointer setup_func(xmlNodePtr node)
 
 static void free_func(gpointer o)
 {
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -119,21 +119,21 @@ static gboolean run_func_toggle(ObActionsData *data, gpointer options)
 /* 3.4-compatibility */
 static gpointer setup_both_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->dir = BOTH;
     return o;
 }
 
 static gpointer setup_horz_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->dir = HORZ;
     return o;
 }
 
 static gpointer setup_vert_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->dir = VERT;
     return o;
 }

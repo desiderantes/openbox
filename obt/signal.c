@@ -161,7 +161,7 @@ void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data)
     for (i = 0; i < NUM_CORE_SIGNALS; ++i)
         g_return_if_fail(sig != core_signals[i]);
 
-    cb = g_slice_new(ObtSignalCallback);
+    cb = g_new(ObtSignalCallback, 1);
     cb->func = func;
     cb->data = data;
     callbacks[sig] = g_slist_prepend(callbacks[sig], cb);
@@ -198,7 +198,7 @@ void obt_signal_remove_callback(gint sig, ObtSignalHandler func)
             g_assert(all_signals[sig].installed > 0);
 
             callbacks[sig] = g_slist_delete_link(callbacks[sig], it);
-            g_slice_free(ObtSignalCallback, cb);
+            g_free(cb);
 
             /* uninstall the signal handler */
             all_signals[sig].installed--;

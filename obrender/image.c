@@ -72,7 +72,7 @@ static RrImagePic* RrImagePicNew(gint w, gint h, RrPixel32 *data)
 {
     RrImagePic *pic;
 
-    pic = g_slice_new(RrImagePic);
+    pic = g_new(RrImagePic, 1);
     RrImagePicInit(pic, w, h, g_memdup2(data, w*h*sizeof(RrPixel32)));
     return pic;
 }
@@ -85,7 +85,7 @@ static void RrImagePicFree(RrImagePic *pic)
 {
     if (pic) {
         g_free(pic->data);
-        g_slice_free(RrImagePic, pic);
+        g_free(pic);
     }
 }
 
@@ -139,7 +139,7 @@ static void RrImageSetFree(RrImageSet *self)
         }
         g_free(self->resized);
 
-        g_slice_free(RrImageSet, self);
+        g_free(self);
     }
 }
 
@@ -400,7 +400,7 @@ void RrImageUnref(RrImage *self)
         /* free the set as well if there are no images pointing to it */
         if (!set->images)
             RrImageSetFree(set);
-        g_slice_free(RrImage, self);
+        g_free(self);
     }
 }
 
@@ -456,9 +456,9 @@ RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
        a new RrImageSet, and a new RrImage that points to it, and place the
        new image inside the new RrImageSet */
 
-    self = g_slice_new0(RrImage);
+    self = g_new0(RrImage, 1);
     self->ref = 1;
-    self->set = g_slice_new0(RrImageSet);
+    self->set = g_new0(RrImageSet, 1);
     self->set->cache = cache;
     self->set->images = g_slist_append(self->set->images, self);
 
@@ -482,7 +482,7 @@ void DestroyImlibLoader(ImlibLoader *loader)
         return;
 
     imlib_free_image();
-    g_slice_free(ImlibLoader, loader);
+    g_free(loader);
 }
 
 ImlibLoader* LoadWithImlib(gchar *path,
@@ -495,7 +495,7 @@ ImlibLoader* LoadWithImlib(gchar *path,
     
     
     if ((img = imlib_load_image(path))) {
-        loader = g_slice_new0(ImlibLoader);
+        loader = g_new0(ImlibLoader, 1);
         loader->img = img;
     } else {
         return NULL;
@@ -535,7 +535,7 @@ void DestroyRsvgLoader(RsvgLoader *loader)
         cairo_surface_destroy(loader->surface);
     if (loader->handle)
         g_object_unref(loader->handle);
-    g_slice_free(RsvgLoader, loader);
+    g_free(loader);
 }
 
 RsvgLoader* LoadWithRsvg(gchar *path,
@@ -543,7 +543,7 @@ RsvgLoader* LoadWithRsvg(gchar *path,
                          gint *width,
                          gint *height)
 {
-    RsvgLoader *loader = g_slice_new0(RsvgLoader);
+    RsvgLoader *loader = g_new0(RsvgLoader, 1);
 
     if (!(loader->handle = rsvg_handle_new_from_file(path, NULL))) {
         DestroyRsvgLoader(loader);
@@ -827,7 +827,7 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
         }
     }
 
-    pic = g_slice_new(RrImagePic);
+    pic = g_new(RrImagePic, 1);
     RrImagePicInit(pic, dstW, dstH, dststart);
 
     return pic;

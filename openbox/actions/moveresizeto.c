@@ -41,7 +41,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     o->x.pos = G_MININT;
     o->y.pos = G_MININT;
     o->w = G_MININT;
@@ -91,7 +91,7 @@ static gpointer setup_func(xmlNodePtr node)
 
 static void free_func(gpointer o)
 {
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -195,8 +195,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
         actions_client_move(data, FALSE);
 
-        g_slice_free(Rect, area);
-        g_slice_free(Rect, carea);
+        g_free(area);
+        g_free(carea);
     }
 
     return FALSE;
@@ -207,7 +207,7 @@ static gpointer setup_center_func(xmlNodePtr node)
 {
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     o->x.pos = G_MININT;
     o->y.pos = G_MININT;
     o->w = G_MININT;

@@ -50,12 +50,12 @@ static void obt_xml_save_last_error(ObtXmlInst* inst);
 static void destfunc(struct Callback *c)
 {
     g_free(c->tag);
-    g_slice_free(struct Callback, c);
+    g_free(c);
 }
 
 ObtXmlInst* obt_xml_instance_new(void)
 {
-    ObtXmlInst *i = g_slice_new(ObtXmlInst);
+    ObtXmlInst *i = g_new(ObtXmlInst, 1);
     i->ref = 1;
     i->xdg_paths = obt_paths_new();
     i->callbacks = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
@@ -81,7 +81,7 @@ void obt_xml_instance_unref(ObtXmlInst *i)
         g_hash_table_destroy(i->callbacks);
         g_free(i->last_error_file);
         g_free(i->last_error_message);
-        g_slice_free(ObtXmlInst, i);
+        g_free(i);
     }
 }
 
@@ -107,7 +107,7 @@ void obt_xml_register(ObtXmlInst *i, const gchar *tag,
         return;
     }
 
-    c = g_slice_new(struct Callback);
+    c = g_new(struct Callback, 1);
     c->tag = g_strdup(tag);
     c->func = func;
     c->data = data;

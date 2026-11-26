@@ -280,7 +280,7 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y,
     *y = py - frame_size.height / 2;
     *y = MIN(MAX(*y, t), b);
 
-    g_slice_free(Rect, area);
+    g_free(area);
 
     return TRUE;
 }
@@ -500,7 +500,7 @@ gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
         place_least_overlap(client, monitor_area, x, y, frame_size);
     g_assert(ret);
 
-    g_slice_free(Rect, monitor_area);
+    g_free(monitor_area);
 
     /* get where the client should be */
     frame_frame_gravity(client->frame, x, y);

@@ -178,7 +178,7 @@ static gboolean check_typed_match(TypedMatch *tm, const gchar *s)
 }
 
 static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
-    Query *q = g_slice_new0(Query);
+    Query *q = g_new0(Query, 1);
     g_array_append_val(o->queries, q);
 
     q->target = target;
@@ -235,7 +235,7 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
 
 static gpointer setup_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
 
     gboolean zero_terminated = FALSE;
     gboolean clear_to_zero_on_alloc = FALSE;
@@ -311,7 +311,7 @@ static void free_func(gpointer options)
         free_typed_match(&q->role);
         free_typed_match(&q->type);
 
-        g_slice_free(Query, q);
+        g_free(q);
     }
 
     while (o->thenacts) {
@@ -328,7 +328,7 @@ static void free_func(gpointer options)
     }
 
     g_array_unref(o->queries);
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

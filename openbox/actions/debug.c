@@ -19,7 +19,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
 
     if ((n = obt_xml_find_node(node, "string")))
         o->str = obt_xml_node_string(n);
@@ -30,7 +30,7 @@ static void free_func(gpointer options)
 {
     Options *o = options;
     g_free(o->str);
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

@@ -86,7 +86,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     /* don't go anywhere if there are no options given */
     o->type = ABSOLUTE;
     o->u.abs.desktop = screen_desktop;
@@ -164,7 +164,7 @@ static gpointer setup_send_func(xmlNodePtr node)
 
 static void free_func(gpointer o)
 {
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 static gboolean run_func(ObActionsData *data, gpointer options)
@@ -215,7 +215,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 static gpointer setup_follow(xmlNodePtr node)
 {
     xmlNodePtr n;
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->send = TRUE;
     o->follow = TRUE;
     if ((n = obt_xml_find_node(node, "follow")))
@@ -225,7 +225,7 @@ static gpointer setup_follow(xmlNodePtr node)
 
 static gpointer setup_go_last_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->type = LAST;
     return o;
 }
@@ -240,7 +240,7 @@ static gpointer setup_send_last_func(xmlNodePtr node)
 static gpointer setup_go_abs_func(xmlNodePtr node)
 {
     xmlNodePtr n;
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->type = ABSOLUTE;
     if ((n = obt_xml_find_node(node, "desktop")))
         o->u.abs.desktop = obt_xml_node_int(n) - 1;
@@ -265,7 +265,7 @@ static void setup_rel(Options *o, xmlNodePtr node, gboolean lin,
 
 static gpointer setup_go_next_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     setup_rel(o, node, TRUE, OB_DIRECTION_EAST);
     return o;
 }
@@ -279,7 +279,7 @@ static gpointer setup_send_next_func(xmlNodePtr node)
 
 static gpointer setup_go_prev_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     setup_rel(o, node, TRUE, OB_DIRECTION_WEST);
     return o;
 }
@@ -293,7 +293,7 @@ static gpointer setup_send_prev_func(xmlNodePtr node)
 
 static gpointer setup_go_left_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     setup_rel(o, node, FALSE, OB_DIRECTION_WEST);
     return o;
 }
@@ -307,7 +307,7 @@ static gpointer setup_send_left_func(xmlNodePtr node)
 
 static gpointer setup_go_right_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     setup_rel(o, node, FALSE, OB_DIRECTION_EAST);
     return o;
 }
@@ -321,7 +321,7 @@ static gpointer setup_send_right_func(xmlNodePtr node)
 
 static gpointer setup_go_up_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     setup_rel(o, node, FALSE, OB_DIRECTION_NORTH);
     return o;
 }
@@ -335,7 +335,7 @@ static gpointer setup_send_up_func(xmlNodePtr node)
 
 static gpointer setup_go_down_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     setup_rel(o, node, FALSE, OB_DIRECTION_SOUTH);
     return o;
 }

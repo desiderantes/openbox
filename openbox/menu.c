@@ -387,7 +387,7 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 {
     ObMenu *self;
 
-    self = g_slice_new0(ObMenu);
+    self = g_new0(ObMenu, 1);
     self->name = g_strdup(name);
     self->data = data;
 
@@ -407,7 +407,7 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 
        more_menu->more_menu will always be NULL, since there is only 1 for
        each menu. */
-    self->more_menu = g_slice_new0(ObMenu);
+    self->more_menu = g_new0(ObMenu, 1);
     self->more_menu->name = _("More...");
     self->more_menu->title = _("More...");
     self->more_menu->collate_key = "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
@@ -439,9 +439,9 @@ static void menu_destroy_hash_value(ObMenu *self)
     g_free(self->title);
     g_free(self->collate_key);
     g_free(self->execute);
-    g_slice_free(ObMenu, self->more_menu);
+    g_free(self->more_menu);
 
-    g_slice_free(ObMenu, self);
+    g_free(self);
 }
 
 void menu_free(ObMenu *menu)
@@ -531,7 +531,7 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
 
     g_assert(menu);
 
-    self = g_slice_new0(ObMenuEntry);
+    self = g_new0(ObMenuEntry, 1);
     self->ref = 1;
     self->type = type;
     self->menu = menu;
@@ -578,7 +578,7 @@ void menu_entry_unref(ObMenuEntry *self)
             break;
         }
 
-        g_slice_free(ObMenuEntry, self);
+        g_free(self);
     }
 }
 
@@ -783,13 +783,13 @@ static void sort_range(ObMenu *self, GList *start, GList *end, guint len)
     guint i;
     if (!len) return;
 
-    ar = g_slice_alloc(sizeof(ObMenuEntry*) * len);
+    ar = g_new(ObMenuEntry*, len);
     for (i = 0, it = start; it != g_list_next(end); ++i, it = g_list_next(it))
         ar[i] = it->data;
     qsort(ar, len, sizeof(ObMenuEntry*), sort_func);
     for (i = 0, it = start; it != g_list_next(end); ++i, it = g_list_next(it))
         it->data = ar[i];
-    g_slice_free1(sizeof(ObMenuEntry*) * len, ar);
+    g_free(ar);
 }
 
 void menu_sort_entries(ObMenu *self)

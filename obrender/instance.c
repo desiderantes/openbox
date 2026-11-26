@@ -57,7 +57,7 @@ void print_refs(gint id)
 
 RrInstance* RrInstanceNew (Display *display, gint screen)
 {
-    definst = g_slice_new(RrInstance);
+    definst = g_new(RrInstance, 1);
     definst->display = display;
     definst->screen = screen;
 
@@ -213,7 +213,7 @@ void RrInstanceFree (RrInstance *inst)
         g_free(inst->pseudo_colors);
         g_hash_table_destroy(inst->color_hash);
         g_object_unref(inst->pango);
-        g_slice_free(RrInstance, inst);
+        g_free(inst);
     }
 }
 

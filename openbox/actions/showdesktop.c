@@ -19,7 +19,7 @@ void action_showdesktop_startup(void)
 static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->strict = FALSE;
 
     if ((n = obt_xml_find_node(node, "strict")))
@@ -30,7 +30,7 @@ static gpointer setup_func(xmlNodePtr node)
 
 static void free_func(gpointer o)
 {
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

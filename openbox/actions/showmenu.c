@@ -29,7 +29,7 @@ static gpointer setup_func(xmlNodePtr node)
     Options *o;
     gboolean x_pos_given = FALSE;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     o->monitor = -1;
 
     if ((n = obt_xml_find_node(node, "menu")))
@@ -76,7 +76,7 @@ static void free_func(gpointer options)
 {
     Options *o = options;
     g_free(o->name);
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

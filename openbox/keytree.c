@@ -32,7 +32,7 @@ void tree_destroy(KeyBindingTree *tree)
         g_list_free_full(tree->keylist, g_free);
         if (c == NULL)
             g_slist_free_full(tree->actions, (GDestroyNotify)actions_act_unref);
-        g_slice_free(KeyBindingTree, tree);
+        g_free(tree);
         tree = c;
     }
 }
@@ -49,7 +49,7 @@ KeyBindingTree *tree_build(GList *keylist, gboolean grab, gboolean no_repeat)
         GList *kit;
 
         p = ret;
-        ret = g_slice_new0(KeyBindingTree);
+        ret = g_new0(KeyBindingTree, 1);
 
         for (kit = it; kit != NULL; kit = g_list_previous(kit))
             ret->keylist = g_list_prepend(ret->keylist,
@@ -83,7 +83,7 @@ void tree_assimilate(KeyBindingTree *node)
                 tmp = b;
                 b = b->first_child;
                 g_list_free_full(tmp->keylist, g_free);
-                g_slice_free(KeyBindingTree, tmp);
+                g_free(tmp);
                 a = a->first_child;
             }
         }
@@ -96,7 +96,7 @@ void tree_assimilate(KeyBindingTree *node)
             last->first_child = b->first_child;
             last->first_child->parent = last;
             g_list_free_full(b->keylist, g_free);
-            g_slice_free(KeyBindingTree, b);
+            g_free(b);
         }
     }
 }

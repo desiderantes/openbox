@@ -841,7 +841,7 @@ void event_enter_client(ObClient *client)
             if (focus_delay_timeout_id)
                 g_source_remove(focus_delay_timeout_id);
 
-            data = g_slice_new(ObFocusDelayData);
+            data = g_new(ObFocusDelayData, 1);
             data->client = client;
             data->time = event_time();
             data->serial = event_curserial;
@@ -879,7 +879,7 @@ void event_leave_client(ObClient *client)
             if (unfocus_delay_timeout_id)
                 g_source_remove(unfocus_delay_timeout_id);
 
-            data = g_slice_new(ObFocusDelayData);
+            data = g_new(ObFocusDelayData, 1);
             data->client = client;
             data->time = event_time();
             data->serial = event_curserial;
@@ -1338,7 +1338,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                   client->title, r->x, r->y);
                 }
 
-                g_slice_free(Rect, r);
+                g_free(r);
 
                 /* they still requested a move, so don't change whether a
                    notify is sent or not */
@@ -2114,14 +2114,14 @@ static gboolean event_handle_user_input(ObClient *client, XEvent *e)
 
 static void focus_delay_dest(gpointer data)
 {
-    g_slice_free(ObFocusDelayData, data);
+    g_free(data);
     focus_delay_timeout_id = 0;
     focus_delay_timeout_client = NULL;
 }
 
 static void unfocus_delay_dest(gpointer data)
 {
-    g_slice_free(ObFocusDelayData, data);
+    g_free(data);
     unfocus_delay_timeout_id = 0;
     unfocus_delay_timeout_client = NULL;
 }
@@ -2181,7 +2181,7 @@ static void event_ignore_enter_range(gulong start, gulong end)
     g_assert(start != 0);
     g_assert(end != 0);
 
-    r = g_slice_new(ObSerialRange);
+    r = g_new(ObSerialRange, 1);
     r->start = start;
     r->end = end;
     ignore_serials = g_slist_prepend(ignore_serials, r);
@@ -2216,7 +2216,7 @@ static gboolean is_enter_focus_event_ignored(gulong serial)
         if ((glong)(serial - r->end) > 0) {
             /* past the end */
             ignore_serials = g_slist_delete_link(ignore_serials, it);
-            g_slice_free(ObSerialRange, r);
+            g_free(r);
         }
         else if ((glong)(serial - r->start) >= 0)
             return TRUE;

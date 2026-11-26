@@ -1346,13 +1346,13 @@ typedef struct {
 
 #define RESET_STRUT_LIST(sl) \
     while (sl) { \
-        g_slice_free(ObScreenStrut, (sl)->data); \
+        g_free((sl)->data); \
         sl = g_slist_delete_link(sl, sl); \
     }
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
 { \
-    ObScreenStrut *ss = g_slice_new(ObScreenStrut); \
+    ObScreenStrut *ss = g_new(ObScreenStrut, 1); \
     ss->desktop = d; \
     ss->strut = s;  \
     sl = g_slist_prepend(sl, ss); \
@@ -1511,7 +1511,7 @@ void screen_update_areas(void)
         dims[i*4+1] = area->y;
         dims[i*4+2] = area->width;
         dims[i*4+3] = area->height;
-        g_slice_free(Rect, area);
+        g_free(area);
     }
 
     /* set the legacy workarea hint to the union of all the monitors */
@@ -1684,7 +1684,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
         }
     }
 
-    a = g_slice_new(Rect);
+    a = g_new(Rect, 1);
     a->x = l;
     a->y = t;
     a->width = r - l + 1;
@@ -1751,7 +1751,7 @@ guint screen_find_monitor(const Rect *search)
                counted list. that's easy for the first one, we just mark it for
                subtraction */
             {
-                RectArithmetic *ra = g_slice_new(RectArithmetic);
+                RectArithmetic *ra = g_new(RectArithmetic, 1);
                 ra->r = on_current_monitor;
                 ra->subtract = TRUE;
                 counted = g_slist_prepend(counted, ra);
@@ -1815,14 +1815,14 @@ guint screen_find_monitor(const Rect *search)
             /* we are going to subtract our rect from future monitors, but
                part of it may already be being subtracted/added, so compensate
                to not double add/subtract. */
-            RectArithmetic *reverse = g_slice_new(RectArithmetic);
+            RectArithmetic *reverse = g_new(RectArithmetic, 1);
             RECT_SET_INTERSECTION(reverse->r, saved->r, on_current_monitor);
             reverse->subtract = !saved->subtract;
             /* prepend so we can continue thru the list uninterupted */
             counted = g_slist_prepend(counted, reverse);
         }
         {
-            RectArithmetic *ra = g_slice_new(RectArithmetic);
+            RectArithmetic *ra = g_new(RectArithmetic, 1);
             ra->r = on_current_monitor;
             ra->subtract = TRUE;
             counted = g_slist_prepend(counted, ra);
@@ -1830,7 +1830,7 @@ guint screen_find_monitor(const Rect *search)
     }
 
     while (counted) {
-        g_slice_free(RectArithmetic, counted->data);
+        g_free(counted->data);
         counted = g_slist_delete_link(counted, counted);
     }
 

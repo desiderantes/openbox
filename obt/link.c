@@ -80,7 +80,7 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
     keys = obt_ddparse_group_keys(g);
 
     /* build the ObtLink (we steal all strings from the parser) */
-    link = g_slice_new0(ObtLink);
+    link = g_new0(ObtLink, 1);
     link->ref = 1;
     link->display = TRUE;
 
@@ -223,7 +223,7 @@ void obt_link_unref(ObtLink *dd)
         }
         else if (dd->type == OBT_LINK_TYPE_URL)
             g_free(dd->d.url.addr);
-        g_slice_free(ObtLink, dd);
+        g_free(dd);
     }
 }
 

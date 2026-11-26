@@ -111,7 +111,7 @@ GSList *config_per_app_settings;
 
 ObAppSettings* config_create_app_settings(void)
 {
-    ObAppSettings *settings = g_slice_new0(ObAppSettings);
+    ObAppSettings *settings = g_new0(ObAppSettings, 1);
     settings->type = -1;
     settings->decor = -1;
     settings->shade = -1;
@@ -1237,7 +1237,7 @@ void config_shutdown(void)
         if (itd->class) g_pattern_spec_free(itd->class);
         if (itd->group_name) g_pattern_spec_free(itd->group_name);
         if (itd->group_class) g_pattern_spec_free(itd->group_class);
-        g_slice_free(ObAppSettings, it->data);
+        g_free(it->data);
     }
     g_slist_free(config_per_app_settings);
 }

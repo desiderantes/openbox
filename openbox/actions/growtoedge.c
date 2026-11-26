@@ -42,7 +42,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_slice_new0(Options);
+    o = g_new0(Options, 1);
     o->dir = OB_DIRECTION_NORTH;
 
     if ((n = obt_xml_find_node(node, "direction"))) {
@@ -177,7 +177,7 @@ static gboolean do_grow_all_edges(ObActionsData* data,
 
 static void free_func(gpointer o)
 {
-    g_slice_free(Options, o);
+    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -275,7 +275,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 /* 3.4-compatibility */
 static gpointer setup_north_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_NORTH;
     return o;
@@ -283,7 +283,7 @@ static gpointer setup_north_func(xmlNodePtr node)
 
 static gpointer setup_south_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_SOUTH;
     return o;
@@ -291,7 +291,7 @@ static gpointer setup_south_func(xmlNodePtr node)
 
 static gpointer setup_east_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_EAST;
     return o;
@@ -299,7 +299,7 @@ static gpointer setup_east_func(xmlNodePtr node)
 
 static gpointer setup_west_func(xmlNodePtr node)
 {
-    Options *o = g_slice_new0(Options);
+    Options *o = g_new0(Options, 1);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_WEST;
     return o;

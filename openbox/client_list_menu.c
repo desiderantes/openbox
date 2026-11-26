@@ -125,7 +125,7 @@ static void desk_menu_destroy(ObMenu *menu, gpointer data)
 {
     DesktopData *d = data;
 
-    g_slice_free(DesktopData, d);
+    g_free(d);
 
     desktop_menus = g_slist_remove(desktop_menus, menu);
 }
@@ -155,7 +155,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     for (i = 0; i < screen_num_desktops; ++i) {
         ObMenu *submenu;
         gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
-        DesktopData *ddata = g_slice_new(DesktopData);
+        DesktopData *ddata = g_new(DesktopData, 1);
 
         ddata->desktop = i;
         submenu = menu_new(name, screen_desktop_names[i], FALSE, ddata);
