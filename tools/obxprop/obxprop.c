@@ -156,7 +156,7 @@ gchar* read_strings(gchar *val, guint n, gboolean utf8)
 
     g_slist_free_full(strs, g_free);
     if (ret)
-        return g_string_free(ret, FALSE);
+        return g_string_free_and_steal(ret);
     return NULL;
 }
 
@@ -169,7 +169,7 @@ gchar* read_atoms(Display *d, guchar *val, guint n)
     for (i = 0; i < n; ++i)
         ret = append_string(ret, XGetAtomName(d, ((guint32*)val)[i]), FALSE);
     if (ret)
-        return g_string_free(ret, FALSE);
+        return g_string_free_and_steal(ret);
     return NULL;
 }
 
@@ -195,7 +195,7 @@ gchar* read_numbers(guchar *val, guint n, guint size)
         }
 
     if (ret)
-        return g_string_free(ret, FALSE);
+        return g_string_free_and_steal(ret);
     return NULL;
 }
 

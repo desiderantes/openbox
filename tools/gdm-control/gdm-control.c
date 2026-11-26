@@ -101,7 +101,7 @@ static char* gdm_send_protocol_msg (const char *msg)
 
     if (p) *p = '\0';
 
-    return retval ? g_string_free(retval, FALSE) : NULL;
+    return retval ? g_string_free_and_steal(retval) : NULL;
 }
 
 static gboolean gdm_authenticate()
@@ -188,7 +188,7 @@ static gboolean gdm_connect()
     }
 
     response = gdm_send_protocol_msg(GDM_PROTOCOL_MSG_VERSION);
-    if (!response || strncmp(response, "GDM ", strlen("GDM ")) != 0) {
+    if (!response || !g_str_has_prefix(response, "GDM ")) {
         g_free(response);
 
         g_warning("Failed to get protocol version from GDM");

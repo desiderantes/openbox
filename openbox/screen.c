@@ -1183,8 +1183,7 @@ void screen_update_desktop_names(void)
     guint i;
 
     /* empty the array */
-    g_strfreev(screen_desktop_names);
-    screen_desktop_names = NULL;
+    g_clear_pointer(&screen_desktop_names, g_strfreev);
 
     if (OBT_PROP_GETSS(obt_root(ob_screen),
                        NET_DESKTOP_NAMES, &screen_desktop_names))
@@ -1192,24 +1191,28 @@ void screen_update_desktop_names(void)
     else
         i = 0;
     if (i < screen_num_desktops) {
+        g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
         GSList *it;
 
-        screen_desktop_names = g_renew(gchar*, screen_desktop_names,
-                                       screen_num_desktops + 1);
-        screen_desktop_names[screen_num_desktops] = NULL;
+        if (screen_desktop_names) {
+            g_strv_builder_addv(builder, (const gchar **)screen_desktop_names);
+            g_strfreev(screen_desktop_names);
+        }
 
         it = g_slist_nth(config_desktops_names, i);
 
         for (; i < screen_num_desktops; ++i) {
             if (it && ((char*)it->data)[0]) /* not empty */
                 /* use the names from the config file when possible */
-                screen_desktop_names[i] = g_strdup(it->data);
+                g_strv_builder_add(builder, it->data);
             else
                 /* make up a nice name if it's not though */
-                screen_desktop_names[i] = g_strdup_printf(_("desktop %i"),
-                                                          i + 1);
+                g_strv_builder_take(builder,
+                                    g_strdup_printf(_("desktop %i"), i + 1));
             if (it) it = g_slist_next(it);
         }
+
+        screen_desktop_names = g_strv_builder_end(builder);
 
         /* if we changed any names, then set the root property so we can
            all agree on the names */

@@ -725,8 +725,7 @@ void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
 {
     switch (self->type) {
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        g_free(self->data.separator.label);
-        self->data.separator.label = g_strdup(label);
+        g_set_str(&self->data.separator.label, label);
         break;
     case OB_MENU_ENTRY_TYPE_NORMAL:
         g_free(self->data.normal.label);
