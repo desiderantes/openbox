@@ -459,6 +459,14 @@ RR_API void RrImageAddFromData(RrImage *image, RrPixel32 *data, gint w, gint h);
 RR_API void RrImageRef(RrImage *im);
 RR_API void RrImageUnref(RrImage *im);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrInstance, RrInstanceFree)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrColor, RrColorFree)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrAppearance, RrAppearanceFree)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrButton, RrButtonFree)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrFont, RrFontClose)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrImageCache, RrImageCacheUnref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrImage, RrImageUnref)
+
 G_END_DECLS
 
 #endif /*__render_h*/

@@ -111,6 +111,7 @@ OBT_API ObtLinkAppOpen obt_link_app_open(ObtLink *e);
 OBT_API ObtLinkAppStartup obt_link_app_startup_notify(ObtLink *e);
 OBT_API const gchar* obt_link_app_startup_wmclass(ObtLink *e);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(ObtLink, obt_link_unref)
 
 G_END_DECLS
 

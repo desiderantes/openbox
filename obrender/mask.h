@@ -29,4 +29,6 @@ RR_API void RrPixmapMaskFree(RrPixmapMask *m);
 RR_API RrPixmapMask *RrPixmapMaskCopy(const RrPixmapMask *src);
 RR_API void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const RrRect *area);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrPixmapMask, RrPixmapMaskFree)
+
 #endif

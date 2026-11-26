@@ -46,6 +46,8 @@ OBT_API gboolean obt_paths_mkdir_path(const gchar *path, gint mode);
 */
 OBT_API gboolean obt_paths_try_exec(ObtPaths *p, const gchar *path);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(ObtPaths, obt_paths_unref)
+
 G_END_DECLS
 
 #endif

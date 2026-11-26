@@ -95,6 +95,8 @@ OBT_API gboolean obt_xml_attr_int      (xmlNodePtr node, const gchar *name,
 OBT_API gboolean obt_xml_attr_bool     (xmlNodePtr node, const gchar *name,
                                         gboolean *value);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(ObtXmlInst, obt_xml_instance_unref)
+
 G_END_DECLS
 
 #endif

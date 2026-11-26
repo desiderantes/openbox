@@ -187,6 +187,8 @@ RR_API RrTheme* RrThemeNew(const RrInstance *inst, const gchar *theme,
                            RrFont *active_osd_font, RrFont *inactive_osd_font);
 RR_API void RrThemeFree(RrTheme *theme);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(RrTheme, RrThemeFree)
+
 G_END_DECLS
 
 #endif
