@@ -100,7 +100,12 @@ add_project_arguments(
 )
 
 # Required dependencies
-glib_dep = dependency('glib-2.0', version: '>= 2.28.0')
+glib_dep = dependency('glib-2.0', version: '>= 2.88.0')
+add_project_arguments(
+    '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_88',
+    '-DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_88',
+    language: 'c',
+)
 pango_dep = dependency('pango', version: '>= 1.8.0')
 pangoxft_dep = dependency('pangoxft', version: '>= 1.8.0')
 xft_dep = dependency('xft')

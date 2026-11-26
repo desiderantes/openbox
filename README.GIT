@@ -7,7 +7,7 @@ To build Openbox from git you need:
 - GNU Gettext (optional, for translations)
 - Xlib library/headers (devel package)
 - Xau library/headers (devel package)
-- GLib 2.28+ library/headers (devel package) (http://www.gtk.org)
+- GLib 2.88+ library/headers (devel package) (http://www.gtk.org)
 - libxml2 2.6+ library/headers (devel package)
 - Pango 1.8+ and PangoXft library/headers (devel package)
 - Xft library/headers (devel package)
