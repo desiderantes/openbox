@@ -143,7 +143,7 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
         if ((v = g_hash_table_lookup(keys, "TryExec"))) {
             /* XXX spawn a thread to check TryExec? */
             link->display = link->display &&
-                obt_paths_try_exec(p, v->value.string);
+                obt_paths_try_exec(v->value.string);
         }
 
         if ((v = g_hash_table_lookup(keys, "Path"))) {

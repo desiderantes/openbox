@@ -99,6 +99,7 @@ obt_unittests = executable(
     'obt_unittests',
     files(
         'bsearch_unittest.c',
+        'paths_unittest.c',
         'unittest_base.c',
     ),
     include_directories: root_inc,

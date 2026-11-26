@@ -9,11 +9,13 @@ const gchar* g_active_test_name = NULL;
 
 /* Add all test suites here. Keep them sorted. */
 extern void run_bsearch_unittest(void);
+extern void run_paths_unittest(void);
 
 gint main(gint argc, gchar **argv)
 {
     /* Add all test suites here. Keep them sorted. */
     run_bsearch_unittest();
+    run_paths_unittest();
 
     return g_test_failures == 0 ? 0 : 1;
 }

@@ -44,11 +44,11 @@ extern const gchar* g_active_test_name;
     }
 
 #define EXPECT_STRING_EQ(expected, actual) \
-    if ((expected) != (actual)) { \
+    if (g_strcmp0((expected), (actual)) != 0) { \
         FAILURE_AT(); \
         fprintf(stderr, "Expected: %s\nActual: %s\n", \
                ((expected) ? (expected) : "NULL"), \
-               ((actual) ? (actual) : NULL)); \
+               ((actual) ? (actual) : "NULL")); \
     }
 
 void unittest_start_suite(const char* suite_name);

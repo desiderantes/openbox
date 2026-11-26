@@ -44,7 +44,7 @@ OBT_API gboolean obt_paths_mkdir_path(const gchar *path, gint mode);
 /*! Returns TRUE if the @path points to an executable file.
   If the @path is not an absolute path, then it is searched for in $PATH.
 */
-OBT_API gboolean obt_paths_try_exec(ObtPaths *p, const gchar *path);
+OBT_API gboolean obt_paths_try_exec(const gchar *path);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(ObtPaths, obt_paths_unref)
 
