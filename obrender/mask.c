@@ -24,12 +24,19 @@
 RrPixmapMask *RrPixmapMaskNew(const RrInstance *inst,
                               gint w, gint h, const gchar *data)
 {
-    RrPixmapMask *m = g_new(RrPixmapMask, 1);
+    gsize byte_size;
+    RrPixmapMask *m;
+
+    g_return_val_if_fail(w > 0 && h > 0, NULL);
+    /* round up to nearest byte */
+    if (!g_size_checked_mul(&byte_size, ((gsize)w + 7) / 8, (gsize)h))
+        return NULL;
+
+    m = g_new(RrPixmapMask, 1);
     m->inst = inst;
     m->width = w;
     m->height = h;
-    /* round up to nearest byte */
-    m->data = g_memdup2(data, (gsize)((w + 7) / 8) * (gsize)h);
+    m->data = g_memdup2(data, byte_size);
     m->mask = XCreateBitmapFromData(RrDisplay(inst), RrRootWindow(inst),
                                     data, w, h);
     return m;
@@ -70,12 +77,20 @@ void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const RrRect *area)
 
 RrPixmapMask *RrPixmapMaskCopy(const RrPixmapMask *src)
 {
-    RrPixmapMask *m = g_new(RrPixmapMask, 1);
+    gsize byte_size;
+    RrPixmapMask *m;
+
+    g_return_val_if_fail(src->width > 0 && src->height > 0, NULL);
+    /* round up to nearest byte */
+    if (!g_size_checked_mul(&byte_size, ((gsize)src->width + 7) / 8,
+                            (gsize)src->height))
+        return NULL;
+
+    m = g_new(RrPixmapMask, 1);
     m->inst = src->inst;
     m->width = src->width;
     m->height = src->height;
-    /* round up to nearest byte */
-    m->data = g_memdup2(src->data, (gsize)((src->width + 7) / 8) * (gsize)src->height);
+    m->data = g_memdup2(src->data, byte_size);
     m->mask = XCreateBitmapFromData(RrDisplay(m->inst), RrRootWindow(m->inst),
                                     m->data, m->width, m->height);
     return m;

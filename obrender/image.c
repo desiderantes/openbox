@@ -71,9 +71,15 @@ static void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data)
 static RrImagePic* RrImagePicNew(gint w, gint h, RrPixel32 *data)
 {
     RrImagePic *pic;
+    gsize npix, nbytes;
+
+    g_return_val_if_fail(w > 0 && h > 0, NULL);
+    if (!g_size_checked_mul(&npix, (gsize)w, (gsize)h) ||
+        !g_size_checked_mul(&nbytes, npix, sizeof(RrPixel32)))
+        return NULL;
 
     pic = g_new(RrImagePic, 1);
-    RrImagePicInit(pic, w, h, g_memdup2(data, w*h*sizeof(RrPixel32)));
+    RrImagePicInit(pic, w, h, g_memdup2(data, nbytes));
     return pic;
 }
 
@@ -591,7 +597,13 @@ RsvgLoader* LoadWithRsvg(gchar *path,
         return NULL;
     }
 
-    loader->pixel_data = g_new(guint32, *width * *height);
+    gsize npix;
+    if (!g_size_checked_mul(&npix, (gsize)*width, (gsize)*height)) {
+        DestroyRsvgLoader(loader);
+        return NULL;
+    }
+
+    loader->pixel_data = g_new(guint32, npix);
 
     /*
       Cairo has its data in ARGB with premultiplied alpha, but RrPixel32
@@ -755,7 +767,11 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
     if (srcW == dstW && srcH == dstH)
         return NULL; /* no scaling needed! */
 
-    dststart = dst = g_new(RrPixel32, dstW * dstH);
+    gsize npix;
+    if (!g_size_checked_mul(&npix, (gsize)dstW, (gsize)dstH))
+        return NULL;
+
+    dststart = dst = g_new(RrPixel32, npix);
 
     ratioX = (srcW << FRACTION) / dstW;
     ratioY = (srcH << FRACTION) / dstH;

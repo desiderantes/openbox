@@ -2368,19 +2368,25 @@ void client_update_icons(ObClient *self)
     if (!self->icon_set && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
         gulong *ldata; /* use a long here to satisfy OBT_PROP_SETA32 */
+        gsize npix, ntotal;
 
         w = ob_rr_theme->def_win_icon_w;
         h = ob_rr_theme->def_win_icon_h;
-        ldata = g_new(gulong, w*h+2);
-        ldata[0] = w;
-        ldata[1] = h;
-        for (i = 0; i < w*h; ++i)
-            ldata[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
-                (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
-                (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
-                (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
-        OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, ldata, w*h+2);
-        g_free(ldata);
+        if (w > 0 && h > 0 &&
+            g_size_checked_mul(&npix, (gsize)w, (gsize)h) &&
+            g_size_checked_add(&ntotal, npix, 2))
+        {
+            ldata = g_new(gulong, ntotal);
+            ldata[0] = w;
+            ldata[1] = h;
+            for (gsize j = 0; j < npix; ++j)
+                ldata[j+2] = (((icon[j] >> RrDefaultAlphaOffset) & 0xff) << 24) +
+                    (((icon[j] >> RrDefaultRedOffset) & 0xff) << 16) +
+                    (((icon[j] >> RrDefaultGreenOffset) & 0xff) << 8) +
+                    (((icon[j] >> RrDefaultBlueOffset) & 0xff) << 0);
+            OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, ldata, ntotal);
+            g_free(ldata);
+        }
     } else if (self->frame)
         /* don't draw the icon empty if we're just setting one now anyways,
            we'll get the property change any second */

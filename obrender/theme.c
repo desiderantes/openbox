@@ -1449,11 +1449,16 @@ static void set_default_appearance(RrAppearance *a)
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data)
 {
     RrPixel32 *im, *p;
-    gint i;
+    gsize npix, nbytes, i;
 
-    p = im = g_memdup2(data, width * height * sizeof(RrPixel32));
+    g_return_val_if_fail(width > 0 && height > 0, NULL);
+    if (!g_size_checked_mul(&npix, (gsize)width, (gsize)height) ||
+        !g_size_checked_mul(&nbytes, npix, sizeof(RrPixel32)))
+        return NULL;
 
-    for (i = 0; i < width * height; ++i) {
+    p = im = g_memdup2(data, nbytes);
+
+    for (i = 0; i < npix; ++i) {
         guchar a = ((*p >> 24) & 0xff);
         guchar b = ((*p >> 16) & 0xff);
         guchar g = ((*p >>  8) & 0xff);

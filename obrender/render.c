@@ -75,8 +75,11 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
     g_assert(a->xftdraw != NULL);
 
     if (resized) {
+        gsize npix;
+        if (!g_size_checked_mul(&npix, (gsize)w, (gsize)h))
+            return None;
         g_free(a->surface.pixel_data);
-        a->surface.pixel_data = g_new(RrPixel32, w * h);
+        a->surface.pixel_data = g_new(RrPixel32, npix);
     }
 
     RrRender(a, w, h);
@@ -356,7 +359,16 @@ static void pixel_data_to_pixmap(RrAppearance *l,
 /* this malloc is a complete waste of time on normal 32bpp
    as reduce_depth just sets im->data = data and returns
 */
-    scratch = g_new(RrPixel32, im->width * im->height);
+    {
+        gsize npix;
+        if (im->width <= 0 || im->height <= 0 ||
+            !g_size_checked_mul(&npix, (gsize)im->width, (gsize)im->height))
+        {
+            XDestroyImage(im);
+            return;
+        }
+        scratch = g_new(RrPixel32, npix);
+    }
     im->data = (gchar*) scratch;
     RrReduceDepth(l->inst, in, im);
     XPutImage(RrDisplay(l->inst), out,
@@ -547,7 +559,16 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
     if ((xi->bits_per_pixel == 1) && (xi->bitmap_bit_order != LSBFirst))
         reverse_bits(xi->data, xi->bytes_per_line * xi->height);
 
-    *data = g_new(RrPixel32, pw * ph);
+    {
+        gsize npix;
+        if (!g_size_checked_mul(&npix, (gsize)pw, (gsize)ph)) {
+            XDestroyImage(xi);
+            if (mask)
+                XDestroyImage(xm);
+            return FALSE;
+        }
+        *data = g_new(RrPixel32, npix);
+    }
     RrIncreaseDepth(inst, *data, xi);
 
     if (mask) {
