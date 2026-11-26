@@ -5,20 +5,20 @@ To build Openbox from git you need:
 - Ninja
 - pkg-config
 - GNU Gettext (optional, for translations)
-- Xlib library/headers (devel package)
-- Xau library/headers (devel package)
+- Xlib 1.8+ library/headers (devel package)
+- Xau 1.0.11+ library/headers (devel package)
 - GLib 2.88+ library/headers (devel package) (http://www.gtk.org)
-- libxml2 2.6+ library/headers (devel package)
-- Pango 1.8+ and PangoXft library/headers (devel package)
-- Xft library/headers (devel package)
+- libxml2 2.12+ library/headers (devel package)
+- Pango 1.57+ and PangoXft library/headers (devel package)
+- Xft 2.3.6+ library/headers (devel package)
 
 Also you will probably want:
-- Imlib2 library/headers (devel package)
-- librsvg 2.0 library/headers (devel package)
-- X Cursor library/headers (devel package)
-- Startup Notification library/headers 0.8+ (devel package)
-- X11 Session Management (libSM / libICE) library/headers (devel package)
-- X11 extensions: XKB, XRandR, XShape, Xinerama, XSync
+- Imlib2 1.12+ library/headers (devel package)
+- librsvg 2.61+ library/headers (devel package)
+- X Cursor 1.2+ library/headers (devel package)
+- Startup Notification 0.12+ library/headers (devel package)
+- X11 Session Management (libSM 1.2+ / libICE 1.1+) library/headers (devel package)
+- X11 extensions: XKB, XRandR 1.5+, XShape (Xext 1.3+), Xinerama 1.1+, XSync (Xext 1.3+)
 
 We recommend the latest versions of all these packages.
 

@@ -550,21 +550,40 @@ RsvgLoader* LoadWithRsvg(gchar *path,
         return NULL;
     }
 
-    if (!rsvg_handle_close(loader->handle, NULL)) {
+    gdouble svg_w = 0.0, svg_h = 0.0;
+    if (!rsvg_handle_get_intrinsic_size_in_pixels(loader->handle,
+                                                  &svg_w, &svg_h)) {
+        gboolean has_viewbox = FALSE;
+        RsvgRectangle viewbox = { 0 };
+        rsvg_handle_get_intrinsic_dimensions(loader->handle,
+                                             NULL, NULL,
+                                             NULL, NULL,
+                                             &has_viewbox, &viewbox);
+        if (has_viewbox) {
+            svg_w = viewbox.width;
+            svg_h = viewbox.height;
+        }
+    }
+
+    *width = (gint)svg_w;
+    if (svg_w > (gdouble)*width)
+        ++(*width);
+    *height = (gint)svg_h;
+    if (svg_h > (gdouble)*height)
+        ++(*height);
+
+    if (*width <= 0 || *height <= 0) {
         DestroyRsvgLoader(loader);
         return NULL;
     }
-
-    RsvgDimensionData dimension_data;
-    rsvg_handle_get_dimensions(loader->handle, &dimension_data);
-    *width = dimension_data.width;
-    *height = dimension_data.height;
 
     loader->surface = cairo_image_surface_create(
         CAIRO_FORMAT_ARGB32, *width, *height);
 
     cairo_t* context = cairo_create(loader->surface);
-    gboolean success = rsvg_handle_render_cairo(loader->handle, context);
+    RsvgRectangle viewport = { 0.0, 0.0, (gdouble)*width, (gdouble)*height };
+    gboolean success = rsvg_handle_render_document(loader->handle, context,
+                                                   &viewport, NULL);
     cairo_destroy(context);
 
     if (!success) {

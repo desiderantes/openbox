@@ -106,42 +106,54 @@ add_project_arguments(
     '-DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_88',
     language: 'c',
 )
-pango_dep = dependency('pango', version: '>= 1.8.0')
-pangoxft_dep = dependency('pangoxft', version: '>= 1.8.0')
-xft_dep = dependency('xft')
-xml_dep = dependency('libxml-2.0', version: '>= 2.6.0')
-x11_dep = dependency('x11')
-xau_dep = dependency('xau')
+pango_dep = dependency('pango', version: '>= 1.57.0')
+pangoxft_dep = dependency('pangoxft', version: '>= 1.57.0')
+xft_dep = dependency('xft', version: '>= 2.3.6')
+xml_dep = dependency('libxml-2.0', version: '>= 2.12.0')
+x11_dep = dependency('x11', version: '>= 1.8.0')
+xau_dep = dependency('xau', version: '>= 1.0.11')
 add_project_arguments('-DAUTH=1', language: 'c')
 
 # Optional dependencies
 libsn_dep = dependency(
     'libstartup-notification-1.0',
-    version: '>= 0.8',
+    version: '>= 0.12',
     required: get_option('startup-notification'),
 )
 if libsn_dep.found()
     add_project_arguments('-DUSE_LIBSN=1', language: 'c')
 endif
 
-xcursor_dep = dependency('xcursor', required: get_option('xcursor'))
+xcursor_dep = dependency(
+    'xcursor',
+    version: '>= 1.2.0',
+    required: get_option('xcursor'),
+)
 if xcursor_dep.found()
     add_project_arguments('-DUSE_XCURSOR=1', language: 'c')
 endif
 
-imlib2_dep = dependency('imlib2', required: get_option('imlib2'))
+imlib2_dep = dependency(
+    'imlib2',
+    version: '>= 1.12.0',
+    required: get_option('imlib2'),
+)
 if imlib2_dep.found()
     add_project_arguments('-DUSE_IMLIB2=1', language: 'c')
 endif
 
-librsvg_dep = dependency('librsvg-2.0', required: get_option('librsvg'))
+librsvg_dep = dependency(
+    'librsvg-2.0',
+    version: '>= 2.61.0',
+    required: get_option('librsvg'),
+)
 if librsvg_dep.found()
     add_project_arguments('-DUSE_LIBRSVG=1', language: 'c')
 endif
 
 sm_opt = get_option('session-management')
-sm_dep = dependency('sm', required: sm_opt)
-ice_dep = dependency('ice', required: sm_opt)
+sm_dep = dependency('sm', version: '>= 1.2.0', required: sm_opt)
+ice_dep = dependency('ice', version: '>= 1.1.0', required: sm_opt)
 use_sm = sm_dep.found() and ice_dep.found()
 if use_sm
     add_project_arguments('-DUSE_SM=1', language: 'c')
@@ -165,13 +177,17 @@ if use_xkb
     add_project_arguments('-DXKB=1', language: 'c')
 endif
 
-xrandr_dep = dependency('xrandr', required: get_option('xrandr'))
+xrandr_dep = dependency(
+    'xrandr',
+    version: '>= 1.5.0',
+    required: get_option('xrandr'),
+)
 if xrandr_dep.found()
     add_project_arguments('-DXRANDR=1', language: 'c')
 endif
 
 xshape_opt = get_option('xshape')
-xshape_dep = dependency('xext', required: xshape_opt)
+xshape_dep = dependency('xext', version: '>= 1.3.0', required: xshape_opt)
 use_xshape = false
 if xshape_dep.found()
     use_xshape = (
@@ -194,13 +210,17 @@ if use_xshape
     add_project_arguments('-DSHAPE=1', language: 'c')
 endif
 
-xinerama_dep = dependency('xinerama', required: get_option('xinerama'))
+xinerama_dep = dependency(
+    'xinerama',
+    version: '>= 1.1.0',
+    required: get_option('xinerama'),
+)
 if xinerama_dep.found()
     add_project_arguments('-DXINERAMA=1', language: 'c')
 endif
 
 xsync_opt = get_option('xsync')
-xsync_dep = dependency('xext', required: xsync_opt)
+xsync_dep = dependency('xext', version: '>= 1.3.0', required: xsync_opt)
 use_xsync = false
 if xsync_dep.found()
     use_xsync = (

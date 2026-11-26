@@ -29,28 +29,14 @@
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
-#include <locale.h>
 
 static void measure_font(const RrInstance *inst, RrFont *f)
 {
     PangoFontMetrics *metrics;
     static PangoLanguage *lang = NULL;
 
-    if (lang == NULL) {
-#if PANGO_VERSION_MAJOR > 1 || \
-    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
+    if (lang == NULL)
         lang = pango_language_get_default();
-#else
-        gchar *locale, *p;
-        /* get the default language from the locale
-           (based on gtk_get_default_language in gtkmain.c) */
-        locale = g_strdup(setlocale(LC_CTYPE, NULL));
-        if ((p = strchr(locale, '.'))) *p = '\0'; /* strip off the . */
-        if ((p = strchr(locale, '@'))) *p = '\0'; /* strip off the @ */
-        lang = pango_language_from_string(locale);
-        g_free(locale);
-#endif
-    }
 
     /* measure the ascent and descent */
     metrics = pango_context_get_metrics(inst->pango, f->font_desc, lang);
@@ -172,15 +158,9 @@ static void font_measure_full(const RrFont *f, const gchar *str,
     /* pango_layout_get_pixel_extents lies! this is the right way to get the
        size of the text's area */
     pango_layout_get_extents(f->layout, NULL, &rect);
-#if PANGO_VERSION_MAJOR > 1 || \
-    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
     /* pass the logical rect as the ink rect, this is on purpose so we get the
        full area for the text */
     pango_extents_to_pixels(&rect, NULL);
-#else
-    rect.width = (rect.width + PANGO_SCALE - 1) / PANGO_SCALE;
-    rect.height = (rect.height + PANGO_SCALE - 1) / PANGO_SCALE;
-#endif
     *x = rect.width + ABS(shadow_x) + 4 /* we put a 2 px edge on each side */;
     *y = rect.height + ABS(shadow_y);
 }
@@ -322,12 +302,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         if (!t->flow) {
             pango_xft_render_layout_line
                 (d, &c,
-#if PANGO_VERSION_MAJOR > 1 || \
-    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
                  pango_layout_get_line_readonly(t->font->layout, 0),
-#else
-                 pango_layout_get_line(t->font->layout, 0),
-#endif
                  (x + t->shadow_offset_x) * PANGO_SCALE,
                  (y + t->shadow_offset_y) * PANGO_SCALE);
         }
@@ -365,12 +340,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     if (!t->flow) {
         pango_xft_render_layout_line
             (d, &c,
-#if PANGO_VERSION_MAJOR > 1 || \
-    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
              pango_layout_get_line_readonly(t->font->layout, 0),
-#else
-             pango_layout_get_line(t->font->layout, 0),
-#endif
              x * PANGO_SCALE,
              y * PANGO_SCALE);
     }

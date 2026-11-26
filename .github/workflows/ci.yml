@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  push:
+    branches: [main, work]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc-full
+            cc: gcc
+            meson_args: >-
+              --prefix=/usr
+              --sysconfdir=/etc
+              -Dstartup-notification=enabled
+              -Dxcursor=enabled
+              -Dimlib2=enabled
+              -Dlibrsvg=enabled
+              -Dsession-management=enabled
+              -Dxkb=enabled
+              -Dxrandr=enabled
+              -Dxshape=enabled
+              -Dxinerama=enabled
+              -Dxsync=enabled
+              -Dnls=enabled
+              -Dtests=true
+            check_install: true
+            check_dist: true
+          - name: clang-full
+            cc: clang
+            meson_args: >-
+              -Dstartup-notification=enabled
+              -Dxcursor=enabled
+              -Dimlib2=enabled
+              -Dlibrsvg=enabled
+              -Dsession-management=enabled
+              -Dxkb=enabled
+              -Dxrandr=enabled
+              -Dxshape=enabled
+              -Dxinerama=enabled
+              -Dxsync=enabled
+              -Dnls=enabled
+              -Dtests=true
+          - name: gcc-release
+            cc: gcc
+            meson_args: >-
+              --buildtype=release
+              -Dstartup-notification=enabled
+              -Dxcursor=enabled
+              -Dimlib2=enabled
+              -Dlibrsvg=enabled
+              -Dsession-management=enabled
+              -Dxkb=enabled
+              -Dxrandr=enabled
+              -Dxshape=enabled
+              -Dxinerama=enabled
+              -Dxsync=enabled
+              -Dnls=enabled
+              -Dtests=true
+          - name: gcc-sanitizers
+            cc: gcc
+            meson_args: >-
+              -Db_sanitize=address,undefined
+              -Db_lundef=false
+              -Dstartup-notification=enabled
+              -Dxcursor=enabled
+              -Dimlib2=enabled
+              -Dlibrsvg=enabled
+              -Dsession-management=enabled
+              -Dxkb=enabled
+              -Dxrandr=enabled
+              -Dxshape=enabled
+              -Dxinerama=enabled
+              -Dxsync=enabled
+              -Dnls=enabled
+              -Dtests=true
+          - name: gcc-minimal
+            cc: gcc
+            meson_args: >-
+              -Dstartup-notification=disabled
+              -Dxcursor=disabled
+              -Dimlib2=disabled
+              -Dlibrsvg=disabled
+              -Dsession-management=disabled
+              -Dxkb=disabled
+              -Dxrandr=disabled
+              -Dxshape=disabled
+              -Dxinerama=disabled
+              -Dxsync=disabled
+              -Dnls=disabled
+              -Dtests=false
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc \
+            clang \
+            gettext \
+            pkg-config \
+            meson \
+            ninja-build \
+            libglib2.0-dev \
+            libpango1.0-dev \
+            libxml2-dev \
+            libx11-dev \
+            libxau-dev \
+            libxcursor-dev \
+            libxext-dev \
+            libxft-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libsm-dev \
+            libice-dev \
+            libstartup-notification0-dev \
+            libimlib2-dev \
+            librsvg2-dev
+
+      - name: Configure
+        env:
+          CC: ${{ matrix.cc }}
+        run: meson setup build ${{ matrix.meson_args }}
+
+      - name: Compile
+        run: meson compile -C build
+
+      - name: Test
+        env:
+          G_SLICE: always-malloc
+          G_DEBUG: gc-friendly
+        run: meson test -C build --print-errorlogs
+
+      - name: Stage install & validate pkg-config
+        if: ${{ matrix.check_install == true }}
+        run: |
+          meson install -C build --destdir=/tmp/stage
+          PKG_CONFIG_PATH="$(find /tmp/stage -type d -name pkgconfig | paste -sd: -)" \
+            pkg-config --validate obt-3.5 obrender-3.5
+
+      - name: Check dist tarball
+        if: ${{ matrix.check_dist == true }}
+        run: meson dist -C build ${ACT:+--allow-dirty}
