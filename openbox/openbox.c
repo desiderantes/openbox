@@ -215,11 +215,9 @@ gint main(gint argc, gchar **argv)
             if (reconfigure) obt_keyboard_reload();
 
             {
-                ObtXmlInst *i;
-
                 /* startup the parsing so everything can register sections
                    of the rc */
-                i = obt_xml_instance_new();
+                g_autoptr(ObtXmlInst) i = obt_xml_instance_new();
 
                 /* register all the available actions */
                 actions_startup(reconfigure);
@@ -241,11 +239,10 @@ gint main(gint argc, gchar **argv)
                 }
 
                 if (config_file) {
-                    gchar *p = g_filename_to_utf8(config_file, -1,
-                                                  NULL, NULL, NULL);
+                    g_autofree gchar *p = g_filename_to_utf8(config_file, -1,
+                                                             NULL, NULL, NULL);
                     if (p)
                         OBT_PROP_SETS(obt_root(ob_screen), OB_CONFIG_FILE, p);
-                    g_free(p);
                 }
                 else
                     OBT_PROP_ERASE(obt_root(ob_screen), OB_CONFIG_FILE);
@@ -257,9 +254,6 @@ gint main(gint argc, gchar **argv)
                         obt_xml_last_error_line(i),
                         obt_xml_last_error_message(i));
                 }
-
-                /* we're done with parsing now, kill it */
-                obt_xml_instance_unref(i);
             }
 
             /* load the theme specified in the rc file */

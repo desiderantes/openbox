@@ -46,21 +46,20 @@ static void prompt_handler(const gchar *log_domain, GLogLevelFlags log_level,
 
 void ob_debug_startup(void)
 {
-    ObtPaths *p = obt_paths_new();
-    gchar *dir = g_build_filename(obt_paths_cache_home(p),
-                                  "openbox", NULL);
+    g_autoptr(ObtPaths) p = obt_paths_new();
+    g_autofree gchar *dir = g_build_filename(obt_paths_cache_home(p),
+                                             "openbox", NULL);
 
     /* log messages to a log file!  fancy, no? */
     if (!obt_paths_mkdir_path(dir, 0777))
         g_message(_("Unable to make directory '%s': %s"),
                   dir, g_strerror(errno));
     else {
-        gchar *name = g_build_filename(obt_paths_cache_home(p),
-                                       "openbox", "openbox.log", NULL);
+        g_autofree gchar *name = g_build_filename(obt_paths_cache_home(p),
+                                                  "openbox", "openbox.log", NULL);
         /* unlink it before opening to remove competition */
         unlink(name);
         log_file = fopen(name, "w");
-        g_free(name);
     }
 
     rr_handler_id =
@@ -75,9 +74,6 @@ void ob_debug_startup(void)
     ob_handler_prompt_id =
         g_log_set_handler("Openbox", G_LOG_LEVEL_MASK & ~G_LOG_LEVEL_DEBUG,
                           prompt_handler, NULL);
-
-    obt_paths_unref(p);
-    g_free(dir);
 }
 
 void ob_debug_shutdown(void)

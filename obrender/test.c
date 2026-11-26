@@ -42,8 +42,8 @@ Window ob_root;
 gint main()
 {
     Window win;
-    RrInstance *inst;
-    RrAppearance *look;
+    g_autoptr(RrInstance) inst = NULL;
+    g_autoptr(RrAppearance) look = NULL;
     int done;
 
     XEvent report;
@@ -105,9 +105,6 @@ gint main()
             break;
         }
     }
-
-    RrAppearanceFree (look);
-    RrInstanceFree (inst);
 
     return 1;
 }

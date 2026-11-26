@@ -1132,9 +1132,7 @@ static XrmDatabase loaddb(const gchar *name, gchar **path)
             *path = g_path_get_dirname(s);
         g_free(s);
     } else {
-        ObtPaths *p;
-
-        p = obt_paths_new();
+        g_autoptr(ObtPaths) p = obt_paths_new();
 
         /* XXX backwards compatibility, remove me sometime later */
         s = g_build_filename(g_get_home_dir(), ".themes", name,
@@ -1151,8 +1149,6 @@ static XrmDatabase loaddb(const gchar *name, gchar **path)
                 *path = g_path_get_dirname(s);
             g_free(s);
         }
-
-        obt_paths_unref(p);
     }
 
     if (db == NULL) {

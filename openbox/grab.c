@@ -174,8 +174,7 @@ void grab_startup(gboolean reconfig)
 
 void grab_shutdown(gboolean reconfig)
 {
-    obt_keyboard_context_unref(ic);
-    ic = NULL;
+    g_clear_pointer(&ic, obt_keyboard_context_unref);
 
     if (reconfig) return;
 

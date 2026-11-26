@@ -90,18 +90,14 @@ static void session_state_free(ObSessionState *state);
 
 void session_startup(gint argc, gchar **argv)
 {
-    gchar *dir;
-    ObtPaths *p;
-
     if (!ob_sm_use) return;
 
     sm_argc = argc;
     sm_argv = argv;
 
-    p = obt_paths_new();
-    dir = g_build_filename(obt_paths_cache_home(p),
-                           "openbox", "sessions", NULL);
-    obt_paths_unref(p), p = NULL;
+    g_autoptr(ObtPaths) p = obt_paths_new();
+    g_autofree gchar *dir = g_build_filename(obt_paths_cache_home(p),
+                                             "openbox", "sessions", NULL);
 
     if (!obt_paths_mkdir_path(dir, 0700)) {
         g_message(_("Unable to make directory \"%s\": %s"),
@@ -115,15 +111,12 @@ void session_startup(gint argc, gchar **argv)
             session_load_file(ob_sm_save_file);
         }
     } else {
-        gchar *filename;
-
         /* this algo is from metacity */
-        filename = g_strdup_printf("%u-%u-%u.obs",
-                                   (guint)time(NULL),
-                                   (guint)getpid(),
-                                   g_random_int());
+        g_autofree gchar *filename = g_strdup_printf("%u-%u-%u.obs",
+                                                     (guint)time(NULL),
+                                                     (guint)getpid(),
+                                                     g_random_int());
         ob_sm_save_file = g_build_filename(dir, filename, NULL);
-        g_free(filename);
     }
 
     if (session_connect()) {
@@ -134,8 +127,6 @@ void session_startup(gint argc, gchar **argv)
         session_setup_priority();
         session_setup_clone_command();
     }
-
-    g_free(dir);
 }
 
 void session_shutdown(gboolean permanent)
@@ -678,15 +669,12 @@ GList* session_state_find(ObClient *c)
 
 static void session_load_file(const gchar *path)
 {
-    ObtXmlInst *i;
+    g_autoptr(ObtXmlInst) i = obt_xml_instance_new();
     xmlNodePtr node, n, m;
     GList *it, *inext;
 
-    i = obt_xml_instance_new();
-
     if (!obt_xml_load_file(i, path, "openbox_session")) {
         ob_debug_type(OB_DEBUG_SM, "ERROR: session file is missing root node");
-        obt_xml_instance_unref(i);
         return;
     }
     node = obt_xml_root(i);
@@ -837,8 +825,6 @@ static void session_load_file(const gchar *path)
             session_saved_state = g_list_delete_link(session_saved_state, it);
         }
     }
-
-    obt_xml_instance_unref(i);
 }
 
 void session_request_logout(gboolean silent)
