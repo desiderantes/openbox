@@ -158,7 +158,7 @@ static void ping_end(ObClient *client, gpointer data)
     if ((t = g_hash_table_find(ping_ids, find_client, client))) {
         g_hash_table_remove(ping_ids, &t->id);
 
-        g_source_remove(t->loopid);
+        g_clear_handle_id(&t->loopid, g_source_remove);
 
         g_free(t);
     }

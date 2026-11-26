@@ -1035,7 +1035,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, const GravityPoint *pos,
 */
 static void remove_submenu_hide_timeout(ObMenuFrame *child)
 {
-    if (submenu_hide_timer) g_source_remove(submenu_hide_timer);
+    g_clear_handle_id(&submenu_hide_timer, g_source_remove);
 }
 
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
@@ -1133,9 +1133,9 @@ void menu_frame_hide_all(void)
 {
     GList *it;
 
-    if (config_submenu_show_delay && submenu_show_timer)
+    if (config_submenu_show_delay)
         /* remove any submenu open requests */
-        g_source_remove(submenu_show_timer);
+        g_clear_handle_id(&submenu_show_timer, g_source_remove);
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
 }
@@ -1223,9 +1223,9 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (!entry && oldchild_entry)
         entry = oldchild_entry;
 
-    if (config_submenu_show_delay && submenu_show_timer)
+    if (config_submenu_show_delay)
         /* remove any submenu open requests */
-        g_source_remove(submenu_show_timer);
+        g_clear_handle_id(&submenu_show_timer, g_source_remove);
 
     self->selected = entry;
 
@@ -1245,7 +1245,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
             if (immediate || config_submenu_hide_delay == 0)
                 menu_frame_hide(oldchild);
             else if (config_submenu_hide_delay > 0) {
-                if (submenu_hide_timer) g_source_remove(submenu_hide_timer);
+                g_clear_handle_id(&submenu_hide_timer, g_source_remove);
                 submenu_hide_timer =
                     g_timeout_add_full(G_PRIORITY_DEFAULT,
                                        config_submenu_hide_delay,
@@ -1263,8 +1263,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
                 if (immediate || config_submenu_show_delay == 0)
                     menu_entry_frame_show_submenu(self->selected);
                 else if (config_submenu_show_delay > 0) {
-                    if (submenu_show_timer)
-                        g_source_remove(submenu_show_timer);
+                    g_clear_handle_id(&submenu_show_timer, g_source_remove);
                     submenu_show_timer =
                         g_timeout_add_full(G_PRIORITY_DEFAULT,
                                            config_submenu_show_delay,

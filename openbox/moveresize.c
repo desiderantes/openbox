@@ -325,8 +325,7 @@ void moveresize_end(gboolean cancel)
             moveresize_alarm = None;
         }
 
-        if (sync_timer) g_source_remove(sync_timer);
-        sync_timer = 0;
+        g_clear_handle_id(&sync_timer, g_source_remove);
 #endif
     }
 
@@ -440,7 +439,7 @@ static void do_resize(void)
 
             waiting_for_sync = 1;
 
-            if (sync_timer) g_source_remove(sync_timer);
+            g_clear_handle_id(&sync_timer, g_source_remove);
             sync_timer = g_timeout_add(2000, sync_timeout_func, NULL);
         }
 #endif
@@ -669,8 +668,7 @@ static void do_edge_warp(gint x, gint y)
 
 static void cancel_edge_warp(void)
 {
-    if (edge_warp_timer) g_source_remove(edge_warp_timer);
-    edge_warp_timer = 0;
+    g_clear_handle_id(&edge_warp_timer, g_source_remove);
 }
 
 static void move_with_keys(KeySym sym, guint state)

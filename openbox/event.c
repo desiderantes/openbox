@@ -133,9 +133,8 @@ static void ice_watch(IceConn conn, IcePointer data, Bool opening,
         ch = g_io_channel_unix_new(IceConnectionNumber(conn));
         id = g_io_add_watch(ch, G_IO_IN, ice_handler, conn);
         g_io_channel_unref(ch);
-    } else if (id) {
-        g_source_remove(id);
-        id = 0;
+    } else {
+        g_clear_handle_id(&id, g_source_remove);
     }
 }
 #endif
@@ -838,8 +837,7 @@ void event_enter_client(ObClient *client)
         if (config_focus_delay) {
             ObFocusDelayData *data;
 
-            if (focus_delay_timeout_id)
-                g_source_remove(focus_delay_timeout_id);
+            g_clear_handle_id(&focus_delay_timeout_id, g_source_remove);
 
             data = g_new(ObFocusDelayData, 1);
             data->client = client;
@@ -876,8 +874,7 @@ void event_leave_client(ObClient *client)
         if (config_focus_delay) {
             ObFocusDelayData *data;
 
-            if (unfocus_delay_timeout_id)
-                g_source_remove(unfocus_delay_timeout_id);
+            g_clear_handle_id(&unfocus_delay_timeout_id, g_source_remove);
 
             data = g_new(ObFocusDelayData, 1);
             data->client = client;
@@ -1098,8 +1095,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                    delay is up */
                 e->xcrossing.detail != NotifyInferior)
             {
-                if (config_focus_delay && focus_delay_timeout_id)
-                    g_source_remove(focus_delay_timeout_id);
+                if (config_focus_delay)
+                    g_clear_handle_id(&focus_delay_timeout_id, g_source_remove);
                 if (config_unfocus_leave)
                     event_leave_client(client);
             }
@@ -1151,8 +1148,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                               e->xcrossing.serial,
                               (client?client->window:0));
                 if (config_focus_follow) {
-                    if (config_focus_delay && unfocus_delay_timeout_id)
-                        g_source_remove(unfocus_delay_timeout_id);
+                    if (config_focus_delay)
+                        g_clear_handle_id(&unfocus_delay_timeout_id, g_source_remove);
                     event_enter_client(client);
                 }
             }
@@ -2155,18 +2152,18 @@ static gboolean unfocus_delay_func(gpointer data)
 
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    if (focus_delay_timeout_client == client && focus_delay_timeout_id)
-        g_source_remove(focus_delay_timeout_id);
-    if (unfocus_delay_timeout_client == client && unfocus_delay_timeout_id)
-        g_source_remove(unfocus_delay_timeout_id);
+    if (focus_delay_timeout_client == client)
+        g_clear_handle_id(&focus_delay_timeout_id, g_source_remove);
+    if (unfocus_delay_timeout_client == client)
+        g_clear_handle_id(&unfocus_delay_timeout_id, g_source_remove);
 }
 
 void event_halt_focus_delay(void)
 {
     /* ignore all enter events up till the event which caused this to occur */
     if (event_curserial) event_ignore_enter_range(1, event_curserial);
-    if (focus_delay_timeout_id) g_source_remove(focus_delay_timeout_id);
-    if (unfocus_delay_timeout_id) g_source_remove(unfocus_delay_timeout_id);
+    g_clear_handle_id(&focus_delay_timeout_id, g_source_remove);
+    g_clear_handle_id(&unfocus_delay_timeout_id, g_source_remove);
 }
 
 gulong event_start_ignore_all_enters(void)

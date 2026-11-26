@@ -328,8 +328,7 @@ void popup_hide(ObPopup *self)
 
         event_end_ignore_all_enters(ignore_start);
     } else if (self->delay_mapped) {
-        g_source_remove(self->delay_timer);
-        self->delay_timer = 0;
+        g_clear_handle_id(&self->delay_timer, g_source_remove);
         self->delay_mapped = FALSE;
     }
 }

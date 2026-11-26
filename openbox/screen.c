@@ -683,7 +683,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
     screen_desktop_timeout = FALSE;
-    if (screen_desktop_timer) g_source_remove(screen_desktop_timer);
+    g_clear_handle_id(&screen_desktop_timer, g_source_remove);
     screen_desktop_timer = g_timeout_add(REMEMBER_LAST_DESKTOP_TIME,
                                          last_desktop_func, NULL);
 
@@ -964,8 +964,7 @@ void screen_show_desktop_popup(guint d, gboolean perm)
                               MAX(a->width/3, POPUP_WIDTH));
         pager_popup_show(desktop_popups[i], screen_desktop_names[d], d);
     }
-    if (desktop_popups_timer) g_source_remove(desktop_popups_timer);
-    desktop_popups_timer = 0;
+    g_clear_handle_id(&desktop_popups_timer, g_source_remove);
     if (!perm && !desktop_popups_permanent) {
         /* only hide if its not already being show permanently */
         desktop_popups_timer = g_timeout_add(config_desktop_popup_time,
@@ -980,8 +979,7 @@ void screen_hide_desktop_popup(void)
 {
     guint i;
 
-    if (desktop_popups_timer) g_source_remove(desktop_popups_timer);
-    desktop_popups_timer = 0;
+    g_clear_handle_id(&desktop_popups_timer, g_source_remove);
     desktop_popups_permanent = FALSE;
 
     for (i = 0; i < screen_num_monitors; i++) {

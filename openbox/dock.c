@@ -654,19 +654,21 @@ void dock_hide(gboolean hide)
 {
     if (!hide) {
         if (dock->hidden && config_dock_hide) {
+            g_clear_handle_id(&show_timeout_id, g_source_remove);
             show_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
                                                  config_dock_show_delay,
                                                  show_timeout, &show_timeout_id, destroy_timeout);
-        } else if (!dock->hidden && config_dock_hide && hide_timeout_id) {
-            if (hide_timeout_id) g_source_remove(hide_timeout_id);
+        } else if (!dock->hidden && config_dock_hide) {
+            g_clear_handle_id(&hide_timeout_id, g_source_remove);
         }
     } else {
         if (!dock->hidden && config_dock_hide) {
+            g_clear_handle_id(&hide_timeout_id, g_source_remove);
             hide_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
                                                  config_dock_hide_delay,
                                                  hide_timeout, &hide_timeout_id, destroy_timeout);
-        } else if (dock->hidden && config_dock_hide && show_timeout_id) {
-            if (show_timeout_id) g_source_remove(show_timeout_id);
+        } else if (dock->hidden && config_dock_hide) {
+            g_clear_handle_id(&show_timeout_id, g_source_remove);
         }
     }
 }

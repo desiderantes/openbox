@@ -1073,8 +1073,7 @@ static gboolean find_reparent(XEvent *e, gpointer data)
 void frame_release_client(ObFrame *self)
 {
     /* if there was any animation going on, kill it */
-    if (self->iconify_animation_timer)
-        g_source_remove(self->iconify_animation_timer);
+    g_clear_handle_id(&self->iconify_animation_timer, g_source_remove);
 
     /* check if the app has already reparented its window away */
     if (!xqueue_exists_local(find_reparent, self)) {
@@ -1131,7 +1130,7 @@ void frame_release_client(ObFrame *self)
     window_remove(self->rgriptop);
     window_remove(self->rgripbottom);
 
-    if (self->flash_timer) g_source_remove(self->flash_timer);
+    g_clear_handle_id(&self->flash_timer, g_source_remove);
 }
 
 /* is there anything present between us and the label? */
@@ -1845,8 +1844,7 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
         self->iconify_animation_end = now + time;
 
     if (new_anim) {
-        if (self->iconify_animation_timer)
-            g_source_remove(self->iconify_animation_timer);
+        g_clear_handle_id(&self->iconify_animation_timer, g_source_remove);
         self->iconify_animation_timer =
             g_timeout_add_full(G_PRIORITY_DEFAULT,
                                FRAME_ANIMATE_ICONIFY_STEP_TIME,

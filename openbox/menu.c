@@ -505,7 +505,7 @@ void menu_show(gchar *name, const GravityPoint *pos, gint monitor,
             menu_can_hide = TRUE;
         else {
             menu_can_hide = FALSE;
-            if (menu_timeout_id) g_source_remove(menu_timeout_id);
+            g_clear_handle_id(&menu_timeout_id, g_source_remove);
             menu_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
                                                  config_menu_hide_delay,
                                                  menu_hide_delay_func,
@@ -521,7 +521,7 @@ gboolean menu_hide_delay_reached(void)
 
 void menu_hide_delay_reset(void)
 {
-    if (menu_timeout_id) g_source_remove(menu_timeout_id);
+    g_clear_handle_id(&menu_timeout_id, g_source_remove);
     menu_hide_delay_func(NULL);
 }
 

@@ -243,7 +243,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         mods == config_keyboard_reset_state)
     {
-        if (chain_timer) g_source_remove(chain_timer);
+        g_clear_handle_id(&chain_timer, g_source_remove);
         keyboard_reset_chains(-1);
         return TRUE;
     }
@@ -260,7 +260,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
                 menu_frame_hide_all();
 
             if (p->first_child != NULL) { /* part of a chain */
-                if (chain_timer) g_source_remove(chain_timer);
+                g_clear_handle_id(&chain_timer, g_source_remove);
                 /* 3 second timeout for chains */
                 chain_timer =
                     g_timeout_add_full(G_PRIORITY_DEFAULT,
@@ -344,7 +344,7 @@ void keyboard_startup(gboolean reconfig)
 
 void keyboard_shutdown(gboolean reconfig)
 {
-    if (chain_timer) g_source_remove(chain_timer);
+    g_clear_handle_id(&chain_timer, g_source_remove);
 
     keyboard_unbind_all();
     set_curpos(NULL);
