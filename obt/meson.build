@@ -97,6 +97,7 @@ obt_tests = [
     'bsearch',
     'link',
     'paths',
+    'signal',
 ]
 
 foreach name : obt_tests

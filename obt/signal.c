@@ -16,11 +16,12 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "signal.h"
+#include "obt/signal.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <fcntl.h>
+#include <glib-unix.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 typedef struct _ObtSignalCallback ObtSignalCallback;
@@ -31,23 +32,15 @@ struct _ObtSignalCallback
     gpointer data;
 };
 
-static gboolean signal_prepare(GSource *source, gint *timeout);
-static gboolean signal_check(GSource *source);
-static gboolean signal_occurred(GSource *source, GSourceFunc callback,
-                               gpointer data);
-static void sighandler(gint sig);
-
 /* this should be more than the number of possible signals on any
    architecture... */
 #define NUM_SIGNALS 99
-
-/* a set of all possible signals */
-static sigset_t all_signals_set;
 
 /* keep track of what signals have a signal handler installed, and remember
    the action we replaced when installing it for when we clean up */
 static struct {
     guint installed; /* a ref count */
+    guint glib_source_id; /* non-zero when handled via g_unix_signal_add_full */
     struct sigaction oldact;
 } all_signals[NUM_SIGNALS];
 
@@ -67,39 +60,106 @@ static const gint core_signals[] =
 };
 #define NUM_CORE_SIGNALS (gint)(sizeof(core_signals) / sizeof(core_signals[0]))
 
-static GSourceFuncs source_funcs = {
-    signal_prepare,
-    signal_check,
-    signal_occurred,
-    NULL
-};
-static GSource *gsource = NULL;
 static guint listeners = 0; /* a ref count for the signal listener */
-static gboolean signal_fired;
-guint signals_fired[NUM_SIGNALS];
-GSList *callbacks[NUM_SIGNALS];
+static gint pipe_fds[2] = { -1, -1 };
+static guint pipe_source_id = 0;
+static volatile sig_atomic_t signals_fired[NUM_SIGNALS];
+static GSList *callbacks[NUM_SIGNALS];
+
+static gboolean is_core_signal(gint sig)
+{
+    for (gint i = 0; i < NUM_CORE_SIGNALS; ++i)
+        if (sig == core_signals[i])
+            return TRUE;
+    return FALSE;
+}
+
+static gboolean is_glib_unix_signal(gint sig)
+{
+    switch (sig) {
+    case SIGHUP:
+    case SIGINT:
+    case SIGTERM:
+    case SIGUSR1:
+    case SIGUSR2:
+#ifdef SIGWINCH
+    case SIGWINCH:
+#endif
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+static void dispatch_callbacks(gint sig)
+{
+    for (GSList *it = callbacks[sig]; it; ) {
+        GSList *next = g_slist_next(it);
+        const ObtSignalCallback *cb = it->data;
+        cb->func(sig, cb->data);
+        it = next;
+    }
+}
+
+static gboolean glib_signal_dispatch(gpointer data)
+{
+    dispatch_callbacks(GPOINTER_TO_INT(data));
+    return G_SOURCE_CONTINUE;
+}
+
+static gboolean pipe_signal_dispatch(gint fd, GIOCondition condition,
+                                     gpointer data)
+{
+    guchar buf[64];
+
+    while (read(fd, buf, sizeof(buf)) > 0)
+        ;
+
+    for (gint i = 0; i < NUM_SIGNALS; ++i) {
+        if (signals_fired[i]) {
+            signals_fired[i] = 0;
+            dispatch_callbacks(i);
+        }
+    }
+
+    return G_SOURCE_CONTINUE;
+}
+
+static void sighandler(gint sig)
+{
+    if (sig < 0 || sig >= NUM_SIGNALS)
+        return;
+
+    if (is_core_signal(sig)) {
+        const char msg[] =
+            "How are you gentlemen? All your base are belong to us. "
+            "(Openbox received a fatal signal)\n";
+        ssize_t ignored = write(STDERR_FILENO, msg, sizeof(msg) - 1);
+        (void)ignored;
+        abort();
+    }
+
+    signals_fired[sig] = 1;
+    if (pipe_fds[1] >= 0) {
+        guchar b = (guchar)sig;
+        ssize_t ignored = write(pipe_fds[1], &b, 1);
+        (void)ignored;
+    }
+}
 
 void obt_signal_listen(void)
 {
     if (!listeners) {
-        guint i;
         struct sigaction action;
-        sigset_t sigset;
 
-        /* initialize the all_signals_set */
-        sigfillset(&all_signals_set);
-
-        sigemptyset(&sigset);
+        sigemptyset(&action.sa_mask);
         action.sa_handler = sighandler;
-        action.sa_mask = sigset;
         action.sa_flags = SA_NOCLDSTOP;
 
         /* always grab all the signals that cause core dumps */
-        for (i = 0; i < NUM_CORE_SIGNALS; ++i) {
-            /* SIGABRT is curiously not grabbed here!! that's because when we
-               get one of the core_signals, we use abort() to dump the core.
-               And having the abort() only go back to our signal handler again
-               is less than optimal */
+        for (gint i = 0; i < NUM_CORE_SIGNALS; ++i) {
+            /* SIGABRT is not grabbed here because we call abort() to dump core
+               when a core signal is caught. */
             if (core_signals[i] != SIGABRT) {
                 sigaction(core_signals[i], &action,
                           &all_signals[core_signals[i]].oldact);
@@ -107,10 +167,15 @@ void obt_signal_listen(void)
             }
         }
 
-        gsource = g_source_new(&source_funcs, sizeof(GSource));
-        g_source_set_priority(gsource, G_PRIORITY_HIGH);
-
-        g_source_attach(gsource, NULL);
+        if (g_unix_open_pipe(pipe_fds, O_CLOEXEC, NULL)) {
+            g_unix_set_fd_nonblocking(pipe_fds[0], TRUE, NULL);
+            g_unix_set_fd_nonblocking(pipe_fds[1], TRUE, NULL);
+            pipe_source_id = g_unix_fd_add_full(G_PRIORITY_HIGH,
+                                                pipe_fds[0],
+                                                G_IO_IN,
+                                                pipe_signal_dispatch,
+                                                NULL, NULL);
+        }
     }
 
     ++listeners;
@@ -118,25 +183,34 @@ void obt_signal_listen(void)
 
 void obt_signal_stop(void)
 {
+    g_return_if_fail(listeners > 0);
     --listeners;
 
     if (!listeners) {
-        gint i;
-        GSList *it, *next;
-
-        g_source_unref(gsource);
-        gsource = NULL;
+        g_clear_handle_id(&pipe_source_id, g_source_remove);
 
         /* remove user defined signal handlers */
-        for (i = 0; i < NUM_SIGNALS; ++i)
-            for (it = callbacks[i]; it; it = next) {
+        for (gint i = 0; i < NUM_SIGNALS; ++i) {
+            for (GSList *it = callbacks[i]; it; ) {
+                GSList *next = g_slist_next(it);
                 ObtSignalCallback *cb = it->data;
-                next = g_slist_next(it);
                 obt_signal_remove_callback(i, cb->func);
+                it = next;
             }
+            signals_fired[i] = 0;
+        }
+
+        if (pipe_fds[0] >= 0) {
+            close(pipe_fds[0]);
+            pipe_fds[0] = -1;
+        }
+        if (pipe_fds[1] >= 0) {
+            close(pipe_fds[1]);
+            pipe_fds[1] = -1;
+        }
 
         /* release all the signals that cause core dumps */
-        for (i = 0; i < NUM_CORE_SIGNALS; ++i) {
+        for (gint i = 0; i < NUM_CORE_SIGNALS; ++i) {
             if (all_signals[core_signals[i]].installed) {
                 sigaction(core_signals[i],
                           &all_signals[core_signals[i]].oldact, NULL);
@@ -145,7 +219,7 @@ void obt_signal_stop(void)
         }
 
 #ifdef DEBUG
-        for (i = 0; i < NUM_SIGNALS; ++i)
+        for (gint i = 0; i < NUM_SIGNALS; ++i)
             g_assert(all_signals[i].installed == 0);
 #endif
     }
@@ -154,12 +228,10 @@ void obt_signal_stop(void)
 void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data)
 {
     ObtSignalCallback *cb;
-    gint i;
 
     g_return_if_fail(func != NULL);
-    g_return_if_fail(sig >= 0 && sig <= NUM_SIGNALS);
-    for (i = 0; i < NUM_CORE_SIGNALS; ++i)
-        g_return_if_fail(sig != core_signals[i]);
+    g_return_if_fail(sig >= 0 && sig < NUM_SIGNALS);
+    g_return_if_fail(!is_core_signal(sig));
 
     cb = g_new(ObtSignalCallback, 1);
     cb->func = func;
@@ -168,15 +240,21 @@ void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data)
 
     /* install the signal handler */
     if (!all_signals[sig].installed) {
-        struct sigaction action;
-        sigset_t sigset;
+        if (is_glib_unix_signal(sig)) {
+            all_signals[sig].glib_source_id =
+                g_unix_signal_add_full(G_PRIORITY_HIGH, sig,
+                                       glib_signal_dispatch,
+                                       GINT_TO_POINTER(sig), NULL);
+        }
+        else {
+            struct sigaction action;
 
-        sigemptyset(&sigset);
-        action.sa_handler = sighandler;
-        action.sa_mask = sigset;
-        action.sa_flags = SA_NOCLDSTOP;
+            sigemptyset(&action.sa_mask);
+            action.sa_handler = sighandler;
+            action.sa_flags = SA_NOCLDSTOP;
 
-        sigaction(sig, &action, &all_signals[sig].oldact);
+            sigaction(sig, &action, &all_signals[sig].oldact);
+        }
     }
 
     all_signals[sig].installed++;
@@ -184,15 +262,11 @@ void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data)
 
 void obt_signal_remove_callback(gint sig, ObtSignalHandler func)
 {
-    GSList *it;
-    gint i;
-
     g_return_if_fail(func != NULL);
-    g_return_if_fail(sig >= 0 && sig <= NUM_SIGNALS);
-    for (i = 0; i < NUM_CORE_SIGNALS; ++i)
-        g_return_if_fail(sig != core_signals[i]);
+    g_return_if_fail(sig >= 0 && sig < NUM_SIGNALS);
+    g_return_if_fail(!is_core_signal(sig));
 
-    for (it = callbacks[sig]; it; it = g_slist_next(it)) {
+    for (GSList *it = callbacks[sig]; it; it = g_slist_next(it)) {
         ObtSignalCallback *cb = it->data;
         if (cb->func == func) {
             g_assert(all_signals[sig].installed > 0);
@@ -202,81 +276,14 @@ void obt_signal_remove_callback(gint sig, ObtSignalHandler func)
 
             /* uninstall the signal handler */
             all_signals[sig].installed--;
-            if (!all_signals[sig].installed)
-                sigaction(sig, &all_signals[sig].oldact, NULL);
+            if (!all_signals[sig].installed) {
+                if (all_signals[sig].glib_source_id)
+                    g_clear_handle_id(&all_signals[sig].glib_source_id,
+                                      g_source_remove);
+                else
+                    sigaction(sig, &all_signals[sig].oldact, NULL);
+            }
             break;
         }
     }
-}
-
-static gboolean signal_prepare(GSource *source, gint *timeout)
-{
-    *timeout = -1;
-    return signal_fired;
-}
-
-static gboolean signal_check(GSource *source)
-{
-    return signal_fired;
-}
-
-static gboolean signal_occurred(GSource *source, GSourceFunc callback,
-                                gpointer data)
-{
-    guint i;
-    sigset_t oldset;
-    guint fired[NUM_SIGNALS];
-
-    /* block signals so that we can do this without the data changing
-       on us */
-    sigprocmask(SIG_SETMASK, &all_signals_set, &oldset);
-
-    /* make a copy of the signals that fired */
-    for (i = 0; i < NUM_SIGNALS; ++i) {
-        fired[i] = signals_fired[i];
-        signals_fired[i] = 0;
-    }
-    signal_fired = FALSE;
-
-    sigprocmask(SIG_SETMASK, &oldset, NULL);
-
-    /* call the signal callbacks for the signals */
-    for (i = 0; i < NUM_SIGNALS; ++i) {
-        while (fired[i]) {
-            GSList *it;
-            for (it = callbacks[i]; it; it = g_slist_next(it)) {
-                const ObtSignalCallback *cb = it->data;
-                cb->func(i, cb->data);
-            }
-            --fired[i];
-        }
-    }
-
-    return TRUE; /* repeat */
-}
-
-static void sighandler(gint sig)
-{
-    guint i;
-
-    g_return_if_fail(sig < NUM_SIGNALS);
-
-    for (i = 0; i < NUM_CORE_SIGNALS; ++i)
-        if (sig == core_signals[i]) {
-            /* XXX special case for signals that default to core dump.
-               but throw some helpful output here... */
-
-            fprintf(stderr, "How are you gentlemen? All your base are"
-                    " belong to us. (Openbox received signal %d)\n", sig);
-
-            /* die with a core dump */
-            abort();
-        }
-
-    signal_fired = TRUE;
-    ++signals_fired[sig];
-
-    /* i don't think we want to modify the GMainContext inside a signal
-       handler, so use a GSource instead of an idle func to call back
-       to the application */
 }
