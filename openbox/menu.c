@@ -525,14 +525,37 @@ void menu_hide_delay_reset(void)
     menu_hide_delay_func(NULL);
 }
 
+static void menu_entry_free(ObMenuEntry *self)
+{
+    switch (self->type) {
+    case OB_MENU_ENTRY_TYPE_NORMAL:
+        RrImageUnref(self->data.normal.icon);
+        g_free(self->data.normal.label);
+        g_free(self->data.normal.collate_key);
+        while (self->data.normal.actions) {
+            actions_act_unref(self->data.normal.actions->data);
+            self->data.normal.actions =
+                g_slist_delete_link(self->data.normal.actions,
+                                    self->data.normal.actions);
+        }
+        break;
+    case OB_MENU_ENTRY_TYPE_SUBMENU:
+        RrImageUnref(self->data.submenu.icon);
+        g_free(self->data.submenu.name);
+        break;
+    case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        g_free(self->data.separator.label);
+        break;
+    }
+}
+
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
 {
     ObMenuEntry *self;
 
     g_assert(menu);
 
-    self = g_new0(ObMenuEntry, 1);
-    self->ref = 1;
+    self = g_rc_box_new0(ObMenuEntry);
     self->type = type;
     self->menu = menu;
     self->id = id;
@@ -551,35 +574,14 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
 
 void menu_entry_ref(ObMenuEntry *self)
 {
-    ++self->ref;
+    g_return_if_fail(self != NULL);
+    g_rc_box_acquire(self);
 }
 
 void menu_entry_unref(ObMenuEntry *self)
 {
-    if (self && --self->ref == 0) {
-        switch (self->type) {
-        case OB_MENU_ENTRY_TYPE_NORMAL:
-            RrImageUnref(self->data.normal.icon);
-            g_free(self->data.normal.label);
-            g_free(self->data.normal.collate_key);
-            while (self->data.normal.actions) {
-                actions_act_unref(self->data.normal.actions->data);
-                self->data.normal.actions =
-                    g_slist_delete_link(self->data.normal.actions,
-                                        self->data.normal.actions);
-            }
-            break;
-        case OB_MENU_ENTRY_TYPE_SUBMENU:
-            RrImageUnref(self->data.submenu.icon);
-            g_free(self->data.submenu.name);
-            break;
-        case OB_MENU_ENTRY_TYPE_SEPARATOR:
-            g_free(self->data.separator.label);
-            break;
-        }
-
-        g_free(self);
-    }
+    if (self)
+        g_rc_box_release_full(self, (GDestroyNotify)menu_entry_free);
 }
 
 void menu_clear_entries(ObMenu *self)

@@ -23,14 +23,22 @@
 static gboolean RrImagePicEqual(const RrImagePic *p1,
                                 const RrImagePic *p2);
 
+static void rr_image_cache_free(RrImageCache *self)
+{
+    g_assert(g_hash_table_size(self->pic_table) == 0);
+    g_clear_pointer(&self->pic_table, g_hash_table_unref);
+
+    g_assert(g_hash_table_size(self->name_table) == 0);
+    g_clear_pointer(&self->name_table, g_hash_table_destroy);
+}
+
 RrImageCache* RrImageCacheNew(gint max_resized_saved)
 {
     RrImageCache *self;
 
     g_assert(max_resized_saved >= 0);
 
-    self = g_new(RrImageCache, 1);
-    self->ref = 1;
+    self = g_rc_box_new0(RrImageCache);
     self->max_resized_saved = max_resized_saved;
     self->pic_table = g_hash_table_new((GHashFunc)RrImagePicHash,
                                        (GEqualFunc)RrImagePicEqual);
@@ -40,22 +48,14 @@ RrImageCache* RrImageCacheNew(gint max_resized_saved)
 
 void RrImageCacheRef(RrImageCache *self)
 {
-    ++self->ref;
+    g_return_if_fail(self != NULL);
+    g_rc_box_acquire(self);
 }
 
 void RrImageCacheUnref(RrImageCache *self)
 {
-    if (self && --self->ref == 0) {
-        g_assert(g_hash_table_size(self->pic_table) == 0);
-        g_hash_table_unref(self->pic_table);
-        self->pic_table = NULL;
-
-        g_assert(g_hash_table_size(self->name_table) == 0);
-        g_hash_table_destroy(self->name_table);
-        self->name_table = NULL;
-
-        g_free(self);
-    }
+    if (self)
+        g_rc_box_release_full(self, (GDestroyNotify)rr_image_cache_free);
 }
 
 #define hashsize(n) ((RrPixel32)1<<(n))

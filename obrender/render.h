@@ -248,7 +248,6 @@ typedef void (*RrImageDestroyFunc)(RrImage *image, gpointer data);
   holding the same image data, they will be marged and the RrImages that
   point to them would be updated. */
 struct _RrImage {
-    gint ref;
     RrImageSet *set;
 
     /* This function (if not NULL) will be called just before destroying

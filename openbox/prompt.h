@@ -46,7 +46,6 @@ struct _ObPromptElement {
 struct _ObPrompt
 {
     ObInternalWindow super;
-    gint ref;
 
     ObtIC *ic;
     guint event_mask;

@@ -37,7 +37,6 @@ guint RrImagePicHash(const struct _RrImagePic *p);
   cache, if you hash it, you will find the RrImage.
 */
 struct _RrImageCache {
-    gint ref;
     /*! When an original picture is resized for an RrImage, the resized picture
       is saved in the RrImage.  This specifies how many pictures should be
       saved at a time.  When this is exceeded, the least recently used

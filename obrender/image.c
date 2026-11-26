@@ -382,32 +382,31 @@ static void RrImageSetAddName(RrImageSet *set, const gchar *name)
 **************************************************************************/
 
 
+static void rr_image_free(RrImage *self)
+{
+    RrImageSet *set;
+
+    if (self->destroy_func)
+        self->destroy_func(self, self->destroy_data);
+
+    set = self->set;
+    set->images = g_slist_remove(set->images, self);
+
+    /* free the set as well if there are no images pointing to it */
+    if (!set->images)
+        RrImageSetFree(set);
+}
+
 void RrImageRef(RrImage *self)
 {
-    ++self->ref;
+    g_return_if_fail(self != NULL);
+    g_rc_box_acquire(self);
 }
 
 void RrImageUnref(RrImage *self)
 {
-    if (self && --self->ref == 0) {
-        RrImageSet *set;
-/*
-#ifdef DEBUG
-        g_debug("Refcount to 0, removing ALL pictures from the cache:\n    "
-                "Image 0x%lx", (gulong)self);
-#endif
-*/
-        if (self->destroy_func)
-            self->destroy_func(self, self->destroy_data);
-
-        set = self->set;
-        set->images = g_slist_remove(set->images, self);
-
-        /* free the set as well if there are no images pointing to it */
-        if (!set->images)
-            RrImageSetFree(set);
-        g_free(self);
-    }
+    if (self)
+        g_rc_box_release_full(self, (GDestroyNotify)rr_image_free);
 }
 
 /*! Set function that will be called just before RrImage is destroyed. */
@@ -462,8 +461,7 @@ RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
        a new RrImageSet, and a new RrImage that points to it, and place the
        new image inside the new RrImageSet */
 
-    self = g_new0(RrImage, 1);
-    self->ref = 1;
+    self = g_rc_box_new0(RrImage);
     self->set = g_new0(RrImageSet, 1);
     self->set->cache = cache;
     self->set->images = g_slist_append(self->set->images, self);

@@ -39,8 +39,6 @@ static ObActionsAct *interactive_act = NULL;
 static guint         interactive_initial_state = 0;
 
 struct _ObActionsDefinition {
-    guint ref;
-
     gchar *name;
 
     gboolean canbeinteractive;
@@ -56,8 +54,6 @@ struct _ObActionsDefinition {
 };
 
 struct _ObActionsAct {
-    guint ref;
-
     ObActionsDefinition *def;
     ObActionsIPreFunc i_pre;
     ObActionsIInputFunc i_input;
@@ -105,8 +101,7 @@ ObActionsDefinition* do_register(const gchar *name,
             return NULL;
     }
 
-    def = g_new0(ObActionsDefinition, 1);
-    def->ref = 1;
+    def = g_rc_box_new0(ObActionsDefinition);
     def->name = g_strdup(name);
     def->free = free;
     def->run = run;
@@ -192,17 +187,21 @@ gboolean actions_set_can_stop(const gchar *name,
     return FALSE;
 }
 
+static void actions_definition_free(ObActionsDefinition *def)
+{
+    g_free(def->name);
+}
+
 static void actions_definition_ref(ObActionsDefinition *def)
 {
-    ++def->ref;
+    g_return_if_fail(def != NULL);
+    g_rc_box_acquire(def);
 }
 
 static void actions_definition_unref(ObActionsDefinition *def)
 {
-    if (def && --def->ref == 0) {
-        g_free(def->name);
-        g_free(def);
-    }
+    if (def)
+        g_rc_box_release_full(def, (GDestroyNotify)actions_definition_free);
 }
 
 static ObActionsAct* actions_build_act_from_string(const gchar *name)
@@ -221,15 +220,9 @@ static ObActionsAct* actions_build_act_from_string(const gchar *name)
 
     /* if we found the action */
     if (def) {
-        act = g_new(ObActionsAct, 1);
-        act->ref = 1;
+        act = g_rc_box_new0(ObActionsAct);
         act->def = def;
         actions_definition_ref(act->def);
-        act->i_pre = NULL;
-        act->i_input = NULL;
-        act->i_cancel = NULL;
-        act->i_post = NULL;
-        act->options = NULL;
     } else
         g_message(_("Invalid action \"%s\" requested. No such action exists."),
                   name);
@@ -292,21 +285,25 @@ gboolean actions_act_is_interactive(ObActionsAct *act)
     return act->i_input != NULL;
 }
 
+static void actions_act_free(ObActionsAct *act)
+{
+    /* free the action specific options */
+    if (act->def->free)
+        act->def->free(act->options);
+    /* unref the definition */
+    actions_definition_unref(act->def);
+}
+
 void actions_act_ref(ObActionsAct *act)
 {
-    ++act->ref;
+    g_return_if_fail(act != NULL);
+    g_rc_box_acquire(act);
 }
 
 void actions_act_unref(ObActionsAct *act)
 {
-    if (act && --act->ref == 0) {
-        /* free the action specific options */
-        if (act->def->free)
-            act->def->free(act->options);
-        /* unref the definition */
-        actions_definition_unref(act->def);
-        g_free(act);
-    }
+    if (act)
+        g_rc_box_release_full(act, (GDestroyNotify)actions_act_free);
 }
 
 static void actions_setup_data(ObActionsData *data,

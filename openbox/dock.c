@@ -131,8 +131,7 @@ void dock_shutdown(gboolean reconfig)
     RrAppearanceFree(dock->a_frame);
     window_remove(dock->frame);
     stacking_remove(dock);
-    g_free(dock);
-    dock = NULL;
+    g_clear_pointer(&dock, g_free);
 }
 
 void dock_manage(Window icon_win, Window name_win)

@@ -63,9 +63,8 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     PangoStyle pstyle;
     PangoAttrList *attrlist;
 
-    out = g_new(RrFont, 1);
+    out = g_rc_box_new0(RrFont);
     out->inst = inst;
-    out->ref = 1;
     out->font_desc = pango_font_description_new();
     out->layout = pango_layout_new(inst->pango);
     out->shortcut_underline = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
@@ -120,20 +119,22 @@ RrFont *RrFontOpenDefault(const RrInstance *inst)
                       RrDefaultFontWeight, RrDefaultFontSlant);
 }
 
+static void rr_font_free(RrFont *f)
+{
+    g_object_unref(f->layout);
+    pango_font_description_free(f->font_desc);
+}
+
 void RrFontRef(RrFont *f)
 {
-    ++f->ref;
+    g_return_if_fail(f != NULL);
+    g_rc_box_acquire(f);
 }
 
 void RrFontClose(RrFont *f)
 {
-    if (f) {
-        if (--f->ref < 1) {
-            g_object_unref(f->layout);
-            pango_font_description_free(f->font_desc);
-            g_free(f);
-        }
-    }
+    if (f)
+        g_rc_box_release_full(f, (GDestroyNotify)rr_font_free);
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,

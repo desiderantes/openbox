@@ -150,8 +150,6 @@ struct _ObSeparatorMenuEntry {
 
 struct _ObMenuEntry
 {
-    guint ref;
-
     ObMenuEntryType type;
     ObMenu *menu;
 

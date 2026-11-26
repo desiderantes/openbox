@@ -105,8 +105,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *title,
 
     attrib.override_redirect = FALSE;
 
-    self = g_new0(ObPrompt, 1);
-    self->ref = 1;
+    self = g_rc_box_new0(ObPrompt);
     self->func = func;
     self->cleanup = cleanup;
     self->data = data;
@@ -179,32 +178,36 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *title,
     return self;
 }
 
+static void prompt_free(ObPrompt *self)
+{
+    gint i;
+
+    if (self->mapped)
+        prompt_hide(self);
+
+    prompt_list = g_list_remove(prompt_list, self);
+
+    obt_keyboard_context_unref(self->ic);
+
+    for (i = 0; i < self->n_buttons; ++i) {
+        window_remove(self->button[i].window);
+        XDestroyWindow(obt_display, self->button[i].window);
+    }
+
+    XDestroyWindow(obt_display, self->msg.window);
+    XDestroyWindow(obt_display, self->super.window);
+}
+
 void prompt_ref(ObPrompt *self)
 {
-    ++self->ref;
+    g_return_if_fail(self != NULL);
+    g_rc_box_acquire(self);
 }
 
 void prompt_unref(ObPrompt *self)
 {
-    if (self && --self->ref == 0) {
-        gint i;
-
-        if (self->mapped)
-            prompt_hide(self);
-
-        prompt_list = g_list_remove(prompt_list, self);
-
-        obt_keyboard_context_unref(self->ic);
-
-        for (i = 0; i < self->n_buttons; ++i) {
-            window_remove(self->button[i].window);
-            XDestroyWindow(obt_display, self->button[i].window);
-        }
-
-        XDestroyWindow(obt_display, self->msg.window);
-        XDestroyWindow(obt_display, self->super.window);
-        g_free(self);
-    }
+    if (self)
+        g_rc_box_release_full(self, (GDestroyNotify)prompt_free);
 }
 
 static void prompt_layout(ObPrompt *self)

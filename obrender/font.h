@@ -25,7 +25,6 @@
 
 struct _RrFont {
     const RrInstance *inst;
-    gint ref;
     PangoFontDescription *font_desc;
     PangoLayout *layout; /*!< Used for measuring and rendering strings */
     PangoAttribute *shortcut_underline; /*< For underlining the shortcut key */

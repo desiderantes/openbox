@@ -24,7 +24,6 @@
 
 struct _ObtIC
 {
-    guint ref;
     XIC xic;
     Window client;
     Window focus;
@@ -391,17 +390,22 @@ void obt_keyboard_context_renew(ObtIC *ic)
     }
 }
 
+static void obt_keyboard_context_free(ObtIC *ic)
+{
+    xic_all = g_slist_remove(xic_all, ic);
+    if (ic->xic)
+        XDestroyIC(ic->xic);
+}
+
 ObtIC* obt_keyboard_context_new(Window client, Window focus)
 {
     ObtIC *ic;
 
     g_return_val_if_fail(client != None && focus != None, NULL);
 
-    ic = g_new(ObtIC, 1);
-    ic->ref = 1;
+    ic = g_rc_box_new0(ObtIC);
     ic->client = client;
     ic->focus = focus;
-    ic->xic = NULL;
 
     obt_keyboard_context_renew(ic);
     xic_all = g_slist_prepend(xic_all, ic);
@@ -411,15 +415,12 @@ ObtIC* obt_keyboard_context_new(Window client, Window focus)
 
 void obt_keyboard_context_ref(ObtIC *ic)
 {
-    ++ic->ref;
+    g_return_if_fail(ic != NULL);
+    g_rc_box_acquire(ic);
 }
 
 void obt_keyboard_context_unref(ObtIC *ic)
 {
-    if (--ic->ref < 1) {
-        xic_all = g_slist_remove(xic_all, ic);
-        if (ic->xic)
-            XDestroyIC(ic->xic);
-        g_free(ic);
-    }
+    if (ic)
+        g_rc_box_release_full(ic, (GDestroyNotify)obt_keyboard_context_free);
 }

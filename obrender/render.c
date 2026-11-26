@@ -337,8 +337,7 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->bevel_light);
         RrColorFree(p->split_primary);
         RrColorFree(p->split_secondary);
-        g_free(p->pixel_data);
-        p->pixel_data = NULL;
+        g_clear_pointer(&p->pixel_data, g_free);
         g_free(a);
     }
 }

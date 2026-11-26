@@ -226,8 +226,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
 
-    g_free(popup.a_icon->texture[1].data.rgba.data);
-    popup.a_icon->texture[1].data.rgba.data = NULL;
+    g_clear_pointer(&popup.a_icon->texture[1].data.rgba.data, g_free);
 
     XDestroyWindow(obt_display, popup.list_mode_up);
     XDestroyWindow(obt_display, popup.list_mode_down);

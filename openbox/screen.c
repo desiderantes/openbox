@@ -447,8 +447,7 @@ static void desktop_popups_free()
     for (i = 0; i < screen_num_monitors; i++) {
         pager_popup_free(desktop_popups[i]);
     }
-    g_free(desktop_popups);
-    desktop_popups = NULL;
+    g_clear_pointer(&desktop_popups, g_free);
 }
 
 void screen_shutdown(gboolean reconfig)

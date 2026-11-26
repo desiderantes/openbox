@@ -167,9 +167,7 @@ void xqueue_init(void)
 
 void xqueue_destroy(void)
 {
-    if (q == NULL) return;
-    g_free(q);
-    q = NULL;
+    g_clear_pointer(&q, g_free);
     qsz = 0;
 }
 

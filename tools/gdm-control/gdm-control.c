@@ -85,9 +85,7 @@ static char* gdm_send_protocol_msg (const char *msg)
                    g_strerror (errno));
         return NULL;
     }
-    g_free (p);
-
-    p = NULL;
+    g_clear_pointer(&p, g_free);
     retval = NULL;
     while ((len = read(fd, buf, sizeof(buf) - 1)) > 0) {
         buf[len] = '\0';

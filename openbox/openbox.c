@@ -360,18 +360,14 @@ gint main(gint argc, gchar **argv)
                 xmlprompt = prompt_show_message(xml_error_string,
                                                 _("Openbox Syntax Error"),
                                                 _("Close"));
-                g_free(xml_error_string);
-                xml_error_string = NULL;
+                g_clear_pointer(&xml_error_string, g_free);
             }
 
             g_main_loop_run(ob_main_loop);
             ob_set_state(reconfigure ?
                          OB_STATE_RECONFIGURING : OB_STATE_EXITING);
 
-            if (xmlprompt) {
-                prompt_unref(xmlprompt);
-                xmlprompt = NULL;
-            }
+            g_clear_pointer(&xmlprompt, prompt_unref);
 
             if (!reconfigure)
                 window_unmanage_all();

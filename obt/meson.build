@@ -20,7 +20,6 @@ obt_public_headers = files(
     'paths.h',
     'prop.h',
     'signal.h',
-    'util.h',
     'xml.h',
     'xqueue.h',
 )

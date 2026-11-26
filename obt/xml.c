@@ -34,7 +34,6 @@ struct Callback {
 };
 
 struct _ObtXmlInst {
-    gint ref;
     ObtPaths *xdg_paths;
     GHashTable *callbacks;
     xmlDocPtr doc;
@@ -53,36 +52,34 @@ static void destfunc(struct Callback *c)
     g_free(c);
 }
 
+static void obt_xml_instance_free(ObtXmlInst *i)
+{
+    obt_paths_unref(i->xdg_paths);
+    g_hash_table_destroy(i->callbacks);
+    g_free(i->last_error_file);
+    g_free(i->last_error_message);
+}
+
 ObtXmlInst* obt_xml_instance_new(void)
 {
-    ObtXmlInst *i = g_new(ObtXmlInst, 1);
-    i->ref = 1;
+    ObtXmlInst *i = g_rc_box_new0(ObtXmlInst);
     i->xdg_paths = obt_paths_new();
     i->callbacks = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
                                          (GDestroyNotify)destfunc);
-    i->doc = NULL;
-    i->root = NULL;
-    i->path = NULL;
-    i->last_error_file = NULL;
     i->last_error_line = -1;
-    i->last_error_message = NULL;
     return i;
 }
 
 void obt_xml_instance_ref(ObtXmlInst *i)
 {
-    ++i->ref;
+    g_return_if_fail(i != NULL);
+    g_rc_box_acquire(i);
 }
 
 void obt_xml_instance_unref(ObtXmlInst *i)
 {
-    if (i && --i->ref == 0) {
-        obt_paths_unref(i->xdg_paths);
-        g_hash_table_destroy(i->callbacks);
-        g_free(i->last_error_file);
-        g_free(i->last_error_message);
-        g_free(i);
-    }
+    if (i)
+        g_rc_box_release_full(i, (GDestroyNotify)obt_xml_instance_free);
 }
 
 xmlDocPtr obt_xml_doc(ObtXmlInst *i)
