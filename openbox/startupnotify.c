@@ -22,15 +22,13 @@
 #include "event.h"
 #include "obt/xqueue.h"
 
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 #ifndef USE_LIBSN
 
 void sn_startup(gboolean reconfig) {}
 void sn_shutdown(gboolean reconfig) {}
-gboolean sn_app_starting() { return FALSE; }
+gboolean sn_app_starting(void) { return FALSE; }
 Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
 {
     return CurrentTime;

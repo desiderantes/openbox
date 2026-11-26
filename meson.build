@@ -5,7 +5,8 @@ project(
     license: 'GPL-2.0-or-later',
     meson_version: '>= 1.10.0',
     default_options: [
-        'c_std=gnu17',
+        'c_std=gnu23,gnu17',
+        'warning_level=2',
         'b_ndebug=if-release',
     ],
 )
@@ -80,7 +81,7 @@ install_appsdir = get_option('datadir') / 'applications'
 # Note: openbox/config.h is Openbox's runtime configuration header, so build
 # feature macros are passed via compiler arguments rather than a config.h file.
 add_project_arguments(
-    cc.get_supported_arguments(['-fno-strict-aliasing']),
+    cc.get_supported_arguments(['-fno-strict-aliasing', '-Wno-unused-parameter']),
     language: 'c',
 )
 
@@ -97,34 +98,6 @@ add_project_arguments(
     f'-DPACKAGE_BUGREPORT="@ob_bugreport@"',
     language: 'c',
 )
-
-check_headers = [
-    'ctype.h',
-    'dirent.h',
-    'errno.h',
-    'fcntl.h',
-    'grp.h',
-    'locale.h',
-    'pwd.h',
-    'signal.h',
-    'string.h',
-    'stdio.h',
-    'stdlib.h',
-    'unistd.h',
-    'sys/stat.h',
-    'sys/select.h',
-    'sys/socket.h',
-    'sys/time.h',
-    'sys/types.h',
-    'sys/wait.h',
-]
-
-foreach h : check_headers
-    if cc.has_header(h)
-        macro = 'HAVE_' + h.underscorify().to_upper()
-        add_project_arguments(f'-D@macro@=1', language: 'c')
-    endif
-endforeach
 
 # Required dependencies
 glib_dep = dependency('glib-2.0', version: '>= 2.28.0')

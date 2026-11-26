@@ -30,9 +30,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-#ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h> /* for pid_t */
-#endif
+#include <sys/types.h> /* for pid_t */
 
 struct _ObFrame;
 struct _ObGroup;

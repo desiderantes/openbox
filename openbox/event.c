@@ -48,15 +48,9 @@
 #include <X11/Xatom.h>
 #include <glib.h>
 
-#ifdef HAVE_SYS_SELECT_H
-#  include <sys/select.h>
-#endif
-#ifdef HAVE_SIGNAL_H
-#  include <signal.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h> /* for usleep() */
-#endif
+#include <sys/select.h>
+#include <signal.h>
+#include <unistd.h> /* for usleep() */
 
 #ifdef USE_SM
 #include <X11/ICE/ICElib.h>

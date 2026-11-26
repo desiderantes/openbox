@@ -28,9 +28,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
+#include <unistd.h>
 
 static gboolean  enabled_types[OB_DEBUG_TYPE_NUM] = {FALSE};
 static FILE     *log_file = NULL;

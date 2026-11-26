@@ -7,9 +7,7 @@
 #include "obt/paths.h"
 #include "gettext.h"
 
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 typedef struct {
     gchar   *cmd;

@@ -8,7 +8,7 @@ const gchar* g_active_test_suite = NULL;
 const gchar* g_active_test_name = NULL;
 
 /* Add all test suites here. Keep them sorted. */
-extern void run_bsearch_unittest();
+extern void run_bsearch_unittest(void);
 
 gint main(gint argc, gchar **argv)
 {
@@ -25,7 +25,7 @@ void unittest_start_suite(const char* suite_name)
     printf("[--------] %s\n", suite_name);
 }
 
-void unittest_end_suite()
+void unittest_end_suite(void)
 {
     g_assert(g_active_test_suite);
     printf("[--------] %s\n", g_active_test_suite);
@@ -41,7 +41,7 @@ void unittest_start(const char* test_name)
     printf("[ RUN    ] %s.%s\n", g_active_test_suite, g_active_test_name);
 }
 
-void unittest_end()
+void unittest_end(void)
 {
     g_assert(g_active_test_name);
     if (g_test_failures_at_test_start == g_test_failures) {

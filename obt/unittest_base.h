@@ -52,10 +52,10 @@ extern const gchar* g_active_test_name;
     }
 
 void unittest_start_suite(const char* suite_name);
-void unittest_end_suite();
+void unittest_end_suite(void);
 
 void unittest_start(const char* test_name);
-void unittest_end();
+void unittest_end(void);
 
 #define TEST_START() unittest_start(__func__);
 #define TEST_END() unittest_end();

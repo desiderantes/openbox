@@ -21,9 +21,7 @@
 
 #include <glib.h>
 
-#ifdef HAVE_STRING_H
-#  include <string.h> /* for memset() */
-#endif
+#include <string.h> /* for memset() */
 
 G_BEGIN_DECLS
 

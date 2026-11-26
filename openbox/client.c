@@ -45,13 +45,8 @@
 #include "obt/xqueue.h"
 #include "obt/prop.h"
 
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
-
-#ifdef HAVE_SIGNAL_H
-#  include <signal.h> /* for kill() */
-#endif
+#include <unistd.h>
+#include <signal.h> /* for kill() */
 
 #include <glib.h>
 #include <X11/Xutil.h>

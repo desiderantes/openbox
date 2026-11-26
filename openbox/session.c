@@ -49,10 +49,8 @@ gboolean session_connected(void) { return FALSE; }
 #include <errno.h>
 #include <stdio.h>
 
-#ifdef HAVE_UNISTD_H
-#  include <sys/types.h>
-#  include <unistd.h>
-#endif
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <X11/SM/SMlib.h>
 

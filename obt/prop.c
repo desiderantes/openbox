@@ -21,9 +21,7 @@
 #include "obt/display.h"
 
 #include <X11/Xatom.h>
-#ifdef HAVE_STRING_H
-#  include <string.h>
-#endif
+#include <string.h>
 
 Atom prop_atoms[OBT_PROP_NUM_ATOMS];
 gboolean prop_started = FALSE;

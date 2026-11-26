@@ -31,9 +31,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
 
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 static void pixel_data_to_pixmap(RrAppearance *l,
                                  gint x, gint y, gint w, gint h);

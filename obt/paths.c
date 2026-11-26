@@ -20,27 +20,11 @@
 #include "obt/paths.h"
 #include "obt/util.h"
 
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-#  include <sys/stat.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-#endif
-#ifdef HAVE_STRING_H
-#  include <string.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
-#ifdef HAVE_GRP_H
-#  include <grp.h>
-#endif
-#ifdef HAVE_PWD_H
-#  include <pwd.h>
-#endif
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
 
 struct _ObtPaths
 {
@@ -96,7 +80,7 @@ static GSList* split_paths(const gchar *paths)
     return list;
 }
 
-int gid_cmp(const void *va, const void *vb)
+static int gid_cmp(const void *va, const void *vb)
 {
     const gid_t a = *(const gid_t*)va, b = *(const gid_t*)vb;
     return a>b ? 1 : (a == b ? 0 : -1);
@@ -104,17 +88,11 @@ int gid_cmp(const void *va, const void *vb)
 
 static void find_uid_gid(uid_t *u, gid_t **g, guint *n)
 {
-    struct passwd *pw;
-    const gchar *name;
-    struct group *gr;
-
     gid_t gmain;
     gboolean maininc;
-    int i;
+    guint i;
 
     *u = getuid();
-    pw = getpwuid(*u);
-    name = pw->pw_name;
 
     gmain = getgid();
 

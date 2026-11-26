@@ -52,29 +52,14 @@
 #include "obt/keyboard.h"
 #include "obt/xml.h"
 
-#ifdef HAVE_FCNTL_H
-#  include <fcntl.h>
-#endif
-#ifdef HAVE_SIGNAL_H
-#  include <signal.h>
-#endif
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif
-#ifdef HAVE_LOCALE_H
-#  include <locale.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-#  include <sys/stat.h>
-#  include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_WAIT_H
-#  include <sys/types.h>
-#  include <sys/wait.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
+#include <fcntl.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <locale.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <errno.h>
 
 #include <X11/cursorfont.h>
