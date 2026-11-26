@@ -150,11 +150,7 @@ void session_shutdown(gboolean permanent)
 
         SmcCloseConnection(sm_conn, 0, NULL);
 
-        while (session_saved_state) {
-            session_state_free(session_saved_state->data);
-            session_saved_state = g_list_delete_link(session_saved_state,
-                                                     session_saved_state);
-        }
+        g_clear_list(&session_saved_state, (GDestroyNotify)session_state_free);
     }
 }
 

@@ -820,13 +820,9 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
             config_screen_firstdesk = (unsigned) d;
     }
     if ((n = obt_xml_find_node(node, "names"))) {
-        GSList *it;
         xmlNodePtr nname;
 
-        for (it = config_desktops_names; it; it = it->next)
-            g_free(it->data);
-        g_slist_free(config_desktops_names);
-        config_desktops_names = NULL;
+        g_clear_slist(&config_desktops_names, g_free);
 
         for (nname = obt_xml_find_node(n->children, "name");
              nname;
@@ -1221,13 +1217,8 @@ void config_shutdown(void)
     RrFontClose(config_font_activeosd);
     RrFontClose(config_font_inactiveosd);
 
-    for (it = config_desktops_names; it; it = g_slist_next(it))
-        g_free(it->data);
-    g_slist_free(config_desktops_names);
-
-    for (it = config_menu_files; it; it = g_slist_next(it))
-        g_free(it->data);
-    g_slist_free(config_menu_files);
+    g_clear_slist(&config_desktops_names, g_free);
+    g_clear_slist(&config_menu_files, g_free);
 
     for (it = config_per_app_settings; it; it = g_slist_next(it)) {
         ObAppSettings *itd = (ObAppSettings *)it->data;

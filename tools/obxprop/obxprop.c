@@ -154,10 +154,7 @@ gchar* read_strings(gchar *val, guint n, gboolean utf8)
         g_free(data);
     }
 
-    while (strs) {
-        g_free(strs->data);
-        strs = g_slist_delete_link(strs, strs);
-    }
+    g_slist_free_full(strs, g_free);
     if (ret)
         return g_string_free(ret, FALSE);
     return NULL;

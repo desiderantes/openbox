@@ -134,10 +134,7 @@ static void self_cleanup(ObMenu *menu, gpointer data)
 {
     menu_clear_entries(menu);
 
-    while (desktop_menus) {
-        menu_free(desktop_menus->data);
-        desktop_menus = g_slist_delete_link(desktop_menus, desktop_menus);
-    }
+    g_clear_slist(&desktop_menus, (GDestroyNotify)menu_free);
 }
 
 static gboolean self_update(ObMenuFrame *frame, gpointer data)
@@ -147,10 +144,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 
     menu_clear_entries(menu);
 
-    while (desktop_menus) {
-        menu_free(desktop_menus->data);
-        desktop_menus = g_slist_delete_link(desktop_menus, desktop_menus);
-    }
+    g_clear_slist(&desktop_menus, (GDestroyNotify)menu_free);
 
     for (i = 0; i < screen_num_desktops; ++i) {
         ObMenu *submenu;

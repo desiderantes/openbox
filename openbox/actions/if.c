@@ -314,18 +314,9 @@ static void free_func(gpointer options)
         g_free(q);
     }
 
-    while (o->thenacts) {
-        actions_act_unref(o->thenacts->data);
-        o->thenacts = g_slist_delete_link(o->thenacts, o->thenacts);
-    }
-    while (o->elseacts) {
-        actions_act_unref(o->elseacts->data);
-        o->elseacts = g_slist_delete_link(o->elseacts, o->elseacts);
-    }
-    while (o->noneacts) {
-        actions_act_unref(o->noneacts->data);
-        o->noneacts = g_slist_delete_link(o->noneacts, o->noneacts);
-    }
+    g_slist_free_full(o->thenacts, (GDestroyNotify)actions_act_unref);
+    g_slist_free_full(o->elseacts, (GDestroyNotify)actions_act_unref);
+    g_slist_free_full(o->noneacts, (GDestroyNotify)actions_act_unref);
 
     g_array_unref(o->queries);
     g_free(o);

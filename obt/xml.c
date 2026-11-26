@@ -186,10 +186,7 @@ gboolean obt_xml_load_file(ObtXmlInst *i,
 
     r = load_file(i, NULL, NULL, root_node, paths);
 
-    while (paths) {
-        g_free(paths->data);
-        paths = g_slist_delete_link(paths, paths);
-    }
+    g_slist_free_full(paths, g_free);
     return r;
 }
 
@@ -206,10 +203,7 @@ gboolean obt_xml_load_config_file(ObtXmlInst *i,
 
     r = load_file(i, domain, filename, root_node, paths);
 
-    while (paths) {
-        g_free(paths->data);
-        paths = g_slist_delete_link(paths, paths);
-    }
+    g_slist_free_full(paths, g_free);
     return r;
 }
 
@@ -226,10 +220,7 @@ gboolean obt_xml_load_data_file(ObtXmlInst *i,
 
     r = load_file(i, domain, filename, root_node, paths);
 
-    while (paths) {
-        g_free(paths->data);
-        paths = g_slist_delete_link(paths, paths);
-    }
+    g_slist_free_full(paths, g_free);
     return r;
 }
 
@@ -252,10 +243,7 @@ gboolean obt_xml_load_theme_file(ObtXmlInst *i,
 
     r = load_file(i, domain, filename, root_node, paths);
 
-    while (paths) {
-        g_free(paths->data);
-        paths = g_slist_delete_link(paths, paths);
-    }
+    g_slist_free_full(paths, g_free);
     return r;
 }
 

@@ -532,12 +532,8 @@ static void menu_entry_free(ObMenuEntry *self)
         RrImageUnref(self->data.normal.icon);
         g_free(self->data.normal.label);
         g_free(self->data.normal.collate_key);
-        while (self->data.normal.actions) {
-            actions_act_unref(self->data.normal.actions->data);
-            self->data.normal.actions =
-                g_slist_delete_link(self->data.normal.actions,
-                                    self->data.normal.actions);
-        }
+        g_slist_free_full(self->data.normal.actions,
+                          (GDestroyNotify)actions_act_unref);
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         RrImageUnref(self->data.submenu.icon);
@@ -599,10 +595,7 @@ void menu_clear_entries(ObMenu *self)
     }
 #endif
 
-    while (self->entries) {
-        menu_entry_unref(self->entries->data);
-        self->entries = g_list_delete_link(self->entries, self->entries);
-    }
+    g_clear_list(&self->entries, (GDestroyNotify)menu_entry_unref);
     self->more_menu->entries = self->entries; /* keep it in sync */
 }
 

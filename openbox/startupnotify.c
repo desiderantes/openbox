@@ -71,16 +71,11 @@ void sn_startup(gboolean reconfig)
 
 void sn_shutdown(gboolean reconfig)
 {
-    GSList *it;
-
     if (reconfig) return;
 
     xqueue_remove_callback(sn_handler, NULL);
 
-    for (it = sn_waits; it; it = g_slist_next(it))
-        sn_startup_sequence_unref((SnStartupSequence*)it->data);
-    g_slist_free(sn_waits);
-    sn_waits = NULL;
+    g_clear_slist(&sn_waits, (GDestroyNotify)sn_startup_sequence_unref);
 
     screen_set_root_cursor();
 

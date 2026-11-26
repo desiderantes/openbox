@@ -1341,11 +1341,7 @@ typedef struct {
     StrutPartial *strut;
 } ObScreenStrut;
 
-#define RESET_STRUT_LIST(sl) \
-    while (sl) { \
-        g_free((sl)->data); \
-        sl = g_slist_delete_link(sl, sl); \
-    }
+#define RESET_STRUT_LIST(sl) g_clear_slist(&(sl), g_free)
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
 { \
@@ -1826,10 +1822,7 @@ guint screen_find_monitor(const Rect *search)
         }
     }
 
-    while (counted) {
-        g_free(counted->data);
-        counted = g_slist_delete_link(counted, counted);
-    }
+    g_slist_free_full(counted, g_free);
 
     if (mostpx_index < screen_num_monitors)
         return mostpx_index;

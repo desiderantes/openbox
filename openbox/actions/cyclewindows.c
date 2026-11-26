@@ -148,10 +148,7 @@ static void free_func(gpointer options)
 {
     Options *o = options;
 
-    while (o->actions) {
-        actions_act_unref(o->actions->data);
-        o->actions = g_slist_delete_link(o->actions, o->actions);
-    }
+    g_slist_free_full(o->actions, (GDestroyNotify)actions_act_unref);
 
     g_free(o);
 }

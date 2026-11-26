@@ -152,13 +152,9 @@ void mouse_unbind_all(void)
             ObMouseBinding *b = it->data;
             gint j;
 
-            for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j) {
-                GSList *jt;
-
-                for (jt = b->actions[j]; jt; jt = g_slist_next(jt))
-                    actions_act_unref(jt->data);
-                g_slist_free(b->actions[j]);
-            }
+            for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j)
+                g_slist_free_full(b->actions[j],
+                                  (GDestroyNotify)actions_act_unref);
             g_free(b);
         }
         g_slist_free(bound_contexts[i]);

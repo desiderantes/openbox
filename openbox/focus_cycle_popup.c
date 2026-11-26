@@ -207,6 +207,15 @@ void focus_cycle_popup_startup(gboolean reconfig)
     window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
 }
 
+static void popup_target_free(ObFocusCyclePopupTarget *t)
+{
+    RrImageUnref(t->icon);
+    g_free(t->text);
+    XDestroyWindow(obt_display, t->iconwin);
+    XDestroyWindow(obt_display, t->textwin);
+    g_free(t);
+}
+
 void focus_cycle_popup_shutdown(gboolean reconfig)
 {
     icon_popup_free(single_popup);
@@ -214,17 +223,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     window_remove(popup.bg);
     stacking_remove(INTERNAL_AS_WINDOW(&popup));
 
-    while(popup.targets) {
-        ObFocusCyclePopupTarget *t = popup.targets->data;
-
-        RrImageUnref(t->icon);
-        g_free(t->text);
-        XDestroyWindow(obt_display, t->iconwin);
-        XDestroyWindow(obt_display, t->textwin);
-        g_free(t);
-
-        popup.targets = g_list_delete_link(popup.targets, popup.targets);
-    }
+    g_clear_list(&popup.targets, (GDestroyNotify)popup_target_free);
 
     g_clear_pointer(&popup.a_icon->texture[1].data.rgba.data, g_free);
 
@@ -238,15 +237,6 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     RrAppearanceFree(popup.a_hilite_text);
     RrAppearanceFree(popup.a_text);
     RrAppearanceFree(popup.a_bg);
-}
-
-static void popup_target_free(ObFocusCyclePopupTarget *t)
-{
-    RrImageUnref(t->icon);
-    g_free(t->text);
-    XDestroyWindow(obt_display, t->iconwin);
-    XDestroyWindow(obt_display, t->textwin);
-    g_free(t);
 }
 
 static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
@@ -337,10 +327,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     if (rtargets) {
         change = TRUE; /* removed a window */
 
-        while (rtargets) {
-            popup_target_free(rtargets->data);
-            rtargets = g_list_delete_link(rtargets, rtargets);
-        }
+        g_list_free_full(rtargets, (GDestroyNotify)popup_target_free);
     }
 
     p->n_targets = n;
@@ -355,10 +342,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 
 static void popup_cleanup(void)
 {
-    while(popup.targets) {
-        popup_target_free(popup.targets->data);
-        popup.targets = g_list_delete_link(popup.targets, popup.targets);
-    }
+    g_clear_list(&popup.targets, (GDestroyNotify)popup_target_free);
     popup.n_targets = 0;
     popup.last_target = NULL;
 }
